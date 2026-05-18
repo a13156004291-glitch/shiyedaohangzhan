@@ -111,7 +111,7 @@
         }
 
         .search-input {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, var(--glass-opacity));
             border: 1px solid rgba(255, 255, 255, 0.05);
             color: white;
             transition: all 0.4s;
@@ -156,7 +156,7 @@
                 <h1 id="site-title" class="orbitron text-3xl md:text-4xl font-bold tracking-tighter mb-2 site-title-themed">
                     十夜导航系统
                 </h1>
-                <p class="theme-text text-opacity-60 tracking-[0.4em] uppercase text-[9px] md:text-xs">
+                <p class="theme-text opacity-60 tracking-[0.4em] uppercase text-[9px] md:text-xs">
                     Lightweight Cyberpunk Navigation v1.0
                 </p>
             </header>
@@ -357,7 +357,7 @@
                             <img src="${iconUrl}" alt="${link.title}" class="w-8 h-8 object-contain opacity-70 group-hover:opacity-100 transition-opacity" onerror="this.src='https://favicon.png.pub/v1/${new URL(link.url).hostname}'">
                         </div>
                 <h3 class="text-sm font-bold theme-text transition-colors uppercase orbitron tracking-wider truncate">${link.title}</h3>
-                <p class="text-[10px] text-gray-400 truncate mt-1 opacity-60 group-hover:opacity-100 mono group-hover:text-white transition-all">${new URL(link.url).hostname.replace('www.', '')}</p>
+                <p class="text-[10px] theme-text opacity-40 truncate mt-1 group-hover:opacity-100 mono group-hover:text-white transition-all">${new URL(link.url).hostname.replace('www.', '')}</p>
                     `;
                     grid.appendChild(card);
                 });
