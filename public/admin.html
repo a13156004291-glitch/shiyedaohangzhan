@@ -6,103 +6,168 @@
     <title>十夜导航 | 管理后台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-        body { background: #0a0a14; color: #fff; font-family: sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        body { 
+            background: #050510; 
+            color: #fff; 
+            font-family: sans-serif; 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 255, 0, 0.03));
+            z-index: 1000;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        .glass { background: rgba(10, 10, 20, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); }
         .btn-neon { background: #00f3ff; color: #000; font-weight: bold; transition: all 0.3s; }
         .btn-neon:hover { box-shadow: 0 0 20px #00f3ff; transform: scale(1.02); }
+        
+        .input-dark {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .input-dark:focus {
+            outline: none;
+            border-color: #00f3ff;
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body id="admin-body" class="relative">
+    <div id="bg-overlay" class="fixed inset-0 bg-black z-[-1]" style="opacity: 0.5;"></div>
+    
     <!-- Login Overlay -->
-    <div id="login-overlay" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-        <div class="glass p-8 rounded-2xl w-full max-w-md">
-            <h1 class="orbitron text-2xl text-cyan-400 mb-6 text-center">系统身份验证</h1>
-            <input type="password" id="password-input" placeholder="输入管理密码" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg mb-4 text-white focus:outline-none focus:border-cyan-400">
-            <button onclick="login()" class="w-full btn-neon p-3 rounded-lg">验证身份</button>
-            <p id="login-error" class="text-red-500 text-sm mt-4 text-center hidden"></p>
+    <div id="login-overlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-50">
+        <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 border-cyan-400">
+            <h1 class="orbitron text-3xl font-bold text-white mb-2 text-center tracking-tighter">AUTHENTICATE</h1>
+            <p class="text-gray-500 text-[10px] orbitron mb-8 text-center tracking-[0.2em]">ACCESSING PORTAL CONSOLE</p>
+            <input type="password" id="password-input" placeholder="ACCESS CODE" class="input-dark orbitron text-center mb-6">
+            <button onclick="login()" class="w-full btn-neon py-4 rounded-lg orbitron tracking-widest">INITIALIZE ACCESS</button>
+            <p id="login-error" class="text-red-500 text-[10px] orbitron mt-6 text-center hidden uppercase tracking-widest"></p>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div id="admin-content" class="hidden container mx-auto max-w-6xl">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-10 border-b border-white/10 pb-6">
-            <h1 class="orbitron text-3xl font-bold tracking-tighter text-cyan-400 mb-4 md:mb-0">十夜导航.CONSOLE v1</h1>
-            <div class="flex space-x-4">
-                <button onclick="logout()" class="text-gray-400 hover:text-white transition-colors">退出登录</button>
-                <a href="/" target="_blank" class="text-cyan-400 hover:underline">返回首页 &nearr;</a>
+    <div id="admin-content" class="hidden container mx-auto max-w-6xl px-4 py-12">
+        <header class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/5 pb-8">
+            <div>
+                <h1 class="orbitron text-4xl font-bold tracking-tighter text-white mb-1 uppercase">十夜导航<span class="text-cyan-400">.CONSOLE</span></h1>
+                <p class="text-[10px] text-gray-500 orbitron tracking-[0.4em] uppercase">Control & Data Management Subsystem v1.2</p>
+            </div>
+            <div class="flex items-center space-x-6 mt-6 md:mt-0">
+                <a href="/" target="_blank" class="text-[10px] orbitron tracking-[0.2em] text-cyan-400 hover:text-white transition-colors border-b border-cyan-400/20 pb-1">PREVIEW FRONTEND</a>
+                <button onclick="logout()" class="text-[10px] orbitron tracking-[0.2em] text-red-400 hover:text-red-300 transition-colors">TERMINATE_SESSION</button>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Sidebar / Common Actions -->
-            <div class="space-y-6">
-                <div class="glass p-6 rounded-xl">
-                    <h2 class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">全局设置</h2>
-                    <div class="space-y-4">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Sidebar -->
+            <div class="lg:col-span-4 space-y-8">
+                <div class="glass p-8 rounded-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-5">
+                        <i data-lucide="settings" class="w-20 h-20"></i>
+                    </div>
+                    <h2 class="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-6 flex items-center">
+                        <span class="w-2 h-2 bg-cyan-400 mr-3 animate-pulse"></span>
+                        SYSTEM_SETTINGS
+                    </h2>
+                    <div class="space-y-5">
                         <div>
-                            <label class="block text-xs text-gray-500 mb-1">背景图 URL</label>
-                            <input type="text" id="bg-url-input" class="w-full bg-black/40 border border-white/10 p-2 rounded text-sm mb-2">
+                            <label class="block text-[10px] text-gray-500 mb-2 orbitron uppercase tracking-widest">Background Layer URL</label>
+                            <input type="text" id="bg-url-input" class="input-dark text-xs">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-500 mb-2 flex justify-between">
-                                <span>背景遮罩透明度</span>
-                                <span id="opacity-value">0.4</span>
+                            <label class="block text-[10px] text-gray-500 mb-2 flex justify-between orbitron uppercase tracking-widest">
+                                <span>Opacity Level</span>
+                                <span id="opacity-value" class="text-cyan-400">0.4</span>
                             </label>
-                            <input type="range" id="bg-opacity-input" min="0" max="1" step="0.1" value="0.4" oninput="document.getElementById('opacity-value').innerText = this.value" class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                            <input type="range" id="bg-opacity-input" min="0" max="1" step="0.05" value="0.4" oninput="document.getElementById('opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400">
                         </div>
-                        <button onclick="updateSettings()" class="w-full btn-neon p-2 rounded text-xs transition">保存基础配置</button>
+                        <button onclick="updateSettings()" class="w-full btn-neon py-3 rounded text-[11px] orbitron tracking-widest transition">COMMIT_SYSTEM_CHANGES</button>
                     </div>
                 </div>
 
-                <div class="glass p-6 rounded-xl">
-                    <h2 class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">添加分类</h2>
-                    <input type="text" id="cat-name-input" placeholder="分类名称" class="w-full bg-black/40 border border-white/10 p-2 rounded text-sm mb-2">
-                    <button onclick="addCategory()" class="w-full btn-neon p-2 rounded text-xs">新建分类</button>
+                <div class="glass p-8 rounded-2xl">
+                    <h2 class="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-6 flex items-center">
+                        <span class="w-2 h-2 bg-cyan-400 mr-3"></span>
+                        NEW_DEPLOYMENT
+                    </h2>
+                    <label class="block text-[10px] text-gray-500 mb-2 orbitron uppercase tracking-widest">Category Identifier</label>
+                    <input type="text" id="cat-name-input" placeholder="E.G. DEV_TOOLS" class="input-dark text-xs mb-4 uppercase">
+                    <button onclick="addCategory()" class="w-full bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/5 py-3 rounded text-[11px] orbitron tracking-widest transition">GENERATE_CATEGORY</button>
                 </div>
             </div>
 
             <!-- Content Area -->
-            <div class="lg:col-span-3">
-                <div id="categories-list" class="space-y-8">
-                    <!-- Categories and their links will render here -->
+            <div class="lg:col-span-8">
+                <div id="categories-list" class="space-y-10">
+                    <!-- Loading state -->
+                    <div class="text-center py-20 orbitron text-gray-600 animate-pulse tracking-widest">CONNECTING_TO_D1_STREAMS...</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add Link Modal (Hidden by default) -->
-    <div id="link-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-40 p-4">
-        <div class="glass p-8 rounded-2xl w-full max-w-xl">
-            <h2 id="modal-title" class="orbitron text-xl text-cyan-400 mb-6 uppercase">内容编辑器</h2>
-            <div class="space-y-4">
+    <!-- Link Modal -->
+    <div id="link-modal" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-40 p-4 backdrop-blur-sm">
+        <div class="glass p-10 rounded-2xl w-full max-w-xl border-l-4 border-cyan-400">
+            <h2 id="modal-title" class="orbitron text-2xl font-bold text-white mb-2 uppercase tracking-tighter">Unit_Data_Editor</h2>
+            <p class="text-[10px] text-gray-500 orbitron mb-8 tracking-[0.3em]">MODIFYING CLOUD_D1_CELL</p>
+            
+            <div class="space-y-5">
                 <input type="hidden" id="link-id">
                 <input type="hidden" id="link-cat-id">
                 <div>
-                    <label class="block text-xs text-gray-500 mb-1">站点名称</label>
-                    <input type="text" id="link-title" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg">
+                    <label class="block text-[10px] text-gray-500 mb-2 orbitron tracking-widest">Unit Label</label>
+                    <input type="text" id="link-title" class="input-dark">
                 </div>
                 <div>
-                    <label class="block text-xs text-gray-500 mb-1">URL 链接</label>
-                    <input type="text" id="link-url" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg">
+                    <label class="block text-[10px] text-gray-500 mb-2 orbitron tracking-widest">Resource Link (URL)</label>
+                    <input type="text" id="link-url" class="input-dark mono text-xs">
                 </div>
                 <div>
-                    <label class="block text-xs text-gray-500 mb-1">图标 URL (不填则自动抓取)</label>
-                    <input type="text" id="link-icon" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg">
+                    <label class="block text-[10px] text-gray-500 mb-1 orbitron tracking-widest flex justify-between">
+                        <span>Icon Resource</span>
+                        <span class="text-[8px] text-cyan-400/50">LEAVE EMPTY FOR AUTO-FETCH</span>
+                    </label>
+                    <input type="text" id="link-icon" class="input-dark mono text-xs">
                 </div>
-                <div>
-                    <label class="block text-xs text-gray-500 mb-1">排序权重 (越小越靠前)</label>
-                    <input type="number" id="link-order" value="0" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-2 orbitron tracking-widest">Priority Weight</label>
+                        <input type="number" id="link-order" value="0" class="input-dark">
+                    </div>
                 </div>
-                <div class="flex space-x-4 mt-6">
-                    <button onclick="saveLink()" class="flex-grow btn-neon p-3 rounded-lg">提交保存</button>
-                    <button onclick="closeModal()" class="bg-gray-700 p-3 rounded-lg">取消</button>
+                
+                <div class="flex space-x-4 mt-10">
+                    <button onclick="saveLink()" class="flex-grow btn-neon py-4 rounded-lg orbitron tracking-widest">COMMIT_LINK</button>
+                    <button onclick="closeModal()" class="bg-white/5 border border-white/10 hover:bg-white/10 px-6 py-4 rounded-lg orbitron tracking-widest text-[11px]">ABORT</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         let currentToken = localStorage.getItem('neon_token');
 
@@ -110,6 +175,7 @@
             if (currentToken) {
                 showAdmin();
             }
+            lucide.createIcons();
         });
 
         async function login() {
@@ -126,7 +192,7 @@
                 showAdmin();
             } else {
                 const errorEl = document.getElementById('login-error');
-                errorEl.innerText = data.message;
+                errorEl.innerText = data.message || "AUTHENTICATION FAILURE";
                 errorEl.classList.remove('hidden');
             }
         }
@@ -143,64 +209,92 @@
         }
 
         async function loadData() {
-            const res = await fetch('/api/links');
-            const data = await res.json();
-            
-            const configRes = await fetch('/api/config');
-            const config = await configRes.json();
-            document.getElementById('bg-url-input').value = config.backgroundUrl || '';
-            document.getElementById('bg-opacity-input').value = config.backgroundOpacity || '0.4';
-            document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
+            try {
+                const res = await fetch('/api/links');
+                const data = await res.json();
+                
+                const configRes = await fetch('/api/config');
+                const config = await configRes.json();
+                
+                // Apply background
+                if (config.backgroundUrl) {
+                    document.body.style.backgroundImage = `url('${config.backgroundUrl}')`;
+                }
+                if (config.backgroundOpacity !== undefined) {
+                    document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
+                }
 
-            renderAdminList(data);
+                document.getElementById('bg-url-input').value = config.backgroundUrl || '';
+                document.getElementById('bg-opacity-input').value = config.backgroundOpacity || '0.4';
+                document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
+
+                renderAdminList(data);
+            } catch (e) {
+                console.error(e);
+            }
         }
 
         function renderAdminList(categories) {
             const container = document.getElementById('categories-list');
             container.innerHTML = '';
 
+            if (categories.length === 0) {
+                container.innerHTML = `<div class="glass p-12 text-center orbitron text-gray-600 tracking-widest text-xs uppercase">No active segments detected</div>`;
+                return;
+            }
+
             categories.forEach(cat => {
                 const catDiv = document.createElement('div');
-                catDiv.className = 'glass p-6 rounded-xl relative overflow-hidden';
+                catDiv.className = 'glass rounded-2xl overflow-hidden';
                 
                 catDiv.innerHTML = `
-                    <div class="flex justify-between items-center mb-6">
-                        <input type="text" value="${cat.name}" onchange="updateCat(${cat.id}, this.value, ${cat.order_index})" class="bg-transparent border-b border-cyan-500/20 text-xl font-bold focus:outline-none focus:border-cyan-400">
-                        <div class="flex items-center space-x-3">
-                            <button onclick="openLinkModal(${cat.id})" class="text-xs text-cyan-400 border border-cyan-400 px-3 py-1 rounded-full hover:bg-cyan-400 hover:text-black transition">+ 添加书签</button>
-                            <button onclick="deleteCat(${cat.id})" class="text-xs text-red-400 hover:bg-red-400/10 px-2 py-1 rounded transition">删除分类</button>
+                    <div class="bg-white/5 px-8 py-4 flex justify-between items-center border-b border-white/5">
+                        <div class="flex items-center space-x-4">
+                            <span class="w-1 h-4 bg-cyan-400"></span>
+                            <input type="text" value="${cat.name}" onchange="updateCat(${cat.id}, this.value, ${cat.order_index})" class="bg-transparent border-none text-sm font-bold orbitron text-white focus:outline-none focus:text-cyan-400 w-48 uppercase">
                         </div>
+                        <div class="flex items-center space-x-6">
+                            <button onclick="openLinkModal(${cat.id})" class="text-[10px] orbitron tracking-widest text-cyan-400 hover:text-white transition-colors">ADD_LINK</button>
+                            <button onclick="deleteCat(${cat.id})" class="text-[10px] orbitron tracking-widest text-gray-600 hover:text-red-500 transition-colors">PURGE</button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="grid-${cat.id}"></div>
                     </div>
                 `;
 
-                const linksGrid = document.createElement('div');
-                linksGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+                const linksGrid = catDiv.querySelector(`#grid-${cat.id}`);
 
                 cat.links.forEach(link => {
                     const lDiv = document.createElement('div');
-                    lDiv.className = 'bg-black/40 border border-white/5 p-3 rounded-lg flex items-center justify-between group';
+                    lDiv.className = 'bg-black/40 border border-white/5 p-4 rounded-xl flex items-center justify-between group hover:border-cyan-400/30 transition-all';
                     lDiv.innerHTML = `
-                        <div class="flex items-center space-x-3 overflow-hidden">
-                            <img src="${link.icon || '/favicon.ico'}" class="w-8 h-8 rounded" onerror="this.src='https://lucide.dev/api/icon/globe?color=fff'">
+                        <div class="flex items-center space-x-4 overflow-hidden">
+                            <div class="w-10 h-10 rounded-lg bg-black/60 flex items-center justify-center overflow-hidden border border-white/5">
+                                <img src="${link.icon || 'https://www.google.com/s2/favicons?sz=64&domain=' + new URL(link.url).hostname}" class="w-6 h-6 object-contain" onerror="this.src='/favicon.ico'">
+                            </div>
                             <div class="truncate">
-                                <p class="text-sm font-medium title-el">${link.title}</p>
-                                <p class="text-[10px] text-gray-500 truncate">${link.url}</p>
+                                <p class="text-xs font-bold orbitron text-gray-200 group-hover:text-white truncate">${link.title}</p>
+                                <p class="text-[9px] mono text-gray-600 truncate mt-1">${link.url}</p>
                             </div>
                         </div>
-                        <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
-                            <button onclick="editLink(${JSON.stringify(link).replace(/"/g, '&quot;')})" class="text-xs p-1 hover:text-cyan-400">编辑</button>
-                            <button onclick="deleteLink(${link.id})" class="text-xs p-1 hover:text-red-400">删除</button>
+                        <div class="flex space-x-3 opacity-0 group-hover:opacity-100 transition">
+                            <button onclick='editLink(${JSON.stringify(link).replace(/'/g, "&#39;")})' class="text-[9px] orbitron text-cyan-400 hover:scale-110 transition">EDIT</button>
+                            <button onclick="deleteLink(${link.id})" class="text-[9px] orbitron text-red-400 hover:scale-110 transition">DEL</button>
                         </div>
                     `;
                     linksGrid.appendChild(lDiv);
                 });
 
-                catDiv.appendChild(linksGrid);
+                if (cat.links.length === 0) {
+                    linksGrid.innerHTML = `<div class="col-span-full py-6 text-center text-[9px] orbitron text-gray-700 tracking-widest uppercase">Null pointer links</div>`;
+                }
+
                 container.appendChild(catDiv);
             });
+            lucide.createIcons();
         }
 
-        // --- Generic API Wrapper ---
         async function api(type, action, data) {
             const res = await fetch('/api/links', {
                 method: 'POST',
@@ -211,7 +305,6 @@
             loadData();
         }
 
-        // --- Category handlers ---
         function addCategory() {
             const name = document.getElementById('cat-name-input').value;
             if (!name) return;
@@ -224,12 +317,11 @@
         }
 
         function deleteCat(id) {
-            if (confirm("确定要删除整个分类吗？分类下的网址也将消失。")) {
+            if (confirm("CONFIRM SECTOR PURGE? ALL CHILDREN WILL BE LOST.")) {
                 api('category', 'delete', { id });
             }
         }
 
-        // --- Link Modal ---
         function openLinkModal(catId) {
             document.getElementById('link-modal').style.display = 'flex';
             document.getElementById('link-cat-id').value = catId;
@@ -269,7 +361,7 @@
         }
 
         function deleteLink(id) {
-            if (confirm("删除这个书签？")) {
+            if (confirm("DELETE UNIT DATA?")) {
                 api('link', 'delete', { id });
             }
         }
@@ -286,7 +378,11 @@
                     token: currentToken 
                 })
             });
-            if (res.ok) alert("配置已保存");
+            if (res.ok) {
+                document.body.style.backgroundImage = `url('${backgroundUrl}')`;
+                document.getElementById('bg-overlay').style.opacity = backgroundOpacity;
+                alert("SYSTEM_CONFIG_UPDATED");
+            }
         }
     </script>
 </body>

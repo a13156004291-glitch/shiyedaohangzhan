@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>十夜导航系统 | 网址导航</title>
+    <title>十夜导航系统 | 极简赛博导航</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/font/lucide.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
         :root {
             --neon-blue: #00f3ff;
             --neon-pink: #ff00ff;
             --glass-bg: rgba(10, 10, 20, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glow: 0 0 10px rgba(0, 243, 255, 0.5);
         }
 
         body {
@@ -24,103 +25,202 @@
             font-family: 'Noto Sans SC', sans-serif;
             color: #fff;
             min-height: 100vh;
+            overflow-x: hidden;
+            cursor: default;
         }
 
         .orbitron { font-family: 'Orbitron', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 1000;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.3;
+        }
 
         .glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
         }
 
-        .neon-text {
-            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+        .neon-glow {
+            box-shadow: var(--glow);
         }
 
         .link-card {
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid transparent;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         .link-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-6px) scale(1.03);
+            background: rgba(0, 243, 255, 0.05);
             border-color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 243, 255, 0.2);
         }
 
-        .category-title {
-            position: relative;
-            padding-left: 15px;
+        .link-card .icon-container {
+            transition: all 0.5s ease;
         }
 
-        .category-title::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 70%;
-            background: linear-gradient(to bottom, var(--neon-blue), var(--neon-pink));
-            box-shadow: 0 0 8px var(--neon-blue);
+        .link-card:hover .icon-container {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        .link-card:hover .icon-container img {
+            filter: brightness(0);
         }
 
         /* 隐藏滚动条 */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        ::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-blue); }
 
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #FFF;
-            border-bottom-color: var(--neon-pink);
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
+        .fade-in {
+            animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .search-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: white;
+            transition: all 0.4s;
+        }
+
+        .search-input:focus {
+            background: rgba(0, 0, 0, 0.6);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            outline: none;
+        }
+
+        #clock-container {
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .keyboard-hint {
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-size: 10px;
         }
     </style>
 </head>
 <body id="body-bg">
-    <div id="bg-overlay" class="fixed inset-0 bg-black z-[-1]" style="opacity: 0.4;"></div>
-
-    <div class="container mx-auto px-4 py-8 relative z-10">
-        <header class="text-center mb-12">
-            <h1 class="orbitron text-4xl md:text-6xl font-bold neon-text mb-4">十夜导航系统</h1>
-            <p class="text-gray-400 tracking-widest uppercase text-sm">轻量级赛博朋克导航系统 v1.0</p>
-        </header>
-
-        <div id="loading" class="flex justify-center items-center h-64">
-            <span class="loader"></span>
+    <div id="bg-overlay" class="fixed inset-0 bg-black z-[-1]" style="opacity: 0.5;"></div>
+    
+    <div class="container mx-auto px-4 py-16 relative z-10 max-w-7xl">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-20 fade-in">
+            <header class="text-center md:text-left mb-8 md:mb-0">
+                <h1 class="orbitron text-4xl md:text-6xl font-bold tracking-tighter mb-2 text-white">
+                    十夜<span class="text-cyan-400">导航</span>系统
+                </h1>
+                <p class="text-gray-500 tracking-[0.4em] uppercase text-[9px] md:text-xs">
+                    Lightweight Cyberpunk Navigation v1.0
+                </p>
+            </header>
+            
+            <div id="clock-container" class="glass px-8 py-4 text-center">
+                <div id="clock-time" class="orbitron text-3xl md:text-4xl font-bold text-cyan-400">00:00:00</div>
+                <div id="clock-date" class="mono text-[10px] text-gray-500 mt-1 uppercase tracking-widest">2026.05.18 MON</div>
+            </div>
         </div>
 
-        <div id="navigation-content" class="space-y-12">
+        <!-- 搜索框 -->
+        <div class="max-w-2xl mx-auto mb-20 fade-in" style="animation-delay: 0.2s;">
+            <div class="relative group">
+                <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-cyan-400 transition-colors w-5 h-5"></i>
+                <input type="text" id="search-input" placeholder="输入关键字或按 / 快速搜索..." 
+                    class="search-input w-full py-5 pl-14 pr-20 rounded-2xl glass text-base">
+                <div class="absolute right-5 top-1/2 -translate-y-1/2 hidden md:flex items-center space-x-2 text-gray-500 pointer-events-none">
+                    <span class="keyboard-hint">/</span>
+                    <span class="text-[10px] uppercase font-bold orbitron">Search</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="flex flex-col justify-center items-center h-64 fade-in">
+            <div class="loader"></div>
+            <p class="mt-4 text-gray-500 text-sm orbitron tracking-widest">LOADING DATABASE...</p>
+        </div>
+
+        <div id="navigation-content" class="space-y-16">
             <!-- 分类内容将由 JS 渲染 -->
         </div>
 
-        <footer class="mt-20 text-center text-gray-500 text-xs pb-10">
-            <p>&copy; 2026 十夜导航系统. 基于 Cloudflare D1 构建</p>
+        <footer class="mt-32 text-center border-t border-white/5 pt-10 pb-10 fade-in">
+            <p class="text-gray-600 text-[10px] orbitron tracking-widest uppercase mb-2">Designed for the Dark</p>
+            <p class="text-gray-500 text-[10px]">&copy; 2026 TEN-NIGHT NAV. Power by Cloudflare D1</p>
+            <div class="mt-4 flex justify-center space-x-6">
+                <a href="/admin.html" class="text-gray-500 hover:text-cyan-400 transition-colors text-[10px] uppercase tracking-widest">Access Console</a>
+            </div>
         </footer>
     </div>
 
     <script>
+        let allData = [];
+
         document.addEventListener('DOMContentLoaded', async () => {
             await init();
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            // 搜索监听
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                filterContent(e.target.value);
+            });
+
+            // 快捷键监听
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+                    e.preventDefault();
+                    document.getElementById('search-input').focus();
+                }
+                if (e.key === 'Escape') {
+                    document.getElementById('search-input').blur();
+                }
+            });
         });
+
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('zh-CN', { hour12: false });
+            const dateStr = now.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                weekday: 'short'
+            }).replace(/\//g, '.').toUpperCase();
+            
+            document.getElementById('clock-time').innerText = time;
+            document.getElementById('clock-date').innerText = dateStr;
+        }
 
         async function init() {
             try {
-                // 加载背景
+                // 加载配置
                 const configRes = await fetch('/api/config');
                 const config = await configRes.json();
                 if (config.backgroundUrl) {
@@ -130,15 +230,42 @@
                     document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
                 }
 
-                // 加载链接数据
+                // 加载链接
                 const linksRes = await fetch('/api/links');
-                const data = await linksRes.json();
+                allData = await linksRes.json();
                 
-                render(data);
+                render(allData);
             } catch (err) {
-                console.error("Failed to load data:", err);
-                document.getElementById('loading').innerHTML = '<p class="text-red-500">加载失败，请检查数据库配置。</p>';
+                console.error("Initialization Failed:", err);
+                document.getElementById('loading').innerHTML = `
+                    <div class="text-center p-8 glass border-red-500/20">
+                        <p class="text-red-400 font-bold mb-2">DATABASE INITIALIZATION ERROR</p>
+                        <p class="text-gray-500 text-xs uppercase tracking-widest">Please check D1 configuration and Wrangler bindings.</p>
+                    </div>
+                `;
             }
+            lucide.createIcons();
+        }
+
+        function filterContent(query) {
+            if (!query) {
+                render(allData);
+                lucide.createIcons();
+                return;
+            }
+            query = query.toLowerCase();
+            const filtered = allData.map(cat => {
+                return {
+                    ...cat,
+                    links: cat.links.filter(link => 
+                        link.title.toLowerCase().includes(query) || 
+                        link.url.toLowerCase().includes(query)
+                    )
+                };
+            }).filter(cat => cat.links.length > 0);
+            
+            render(filtered);
+            lucide.createIcons();
         }
 
         function render(categories) {
@@ -147,39 +274,52 @@
             document.getElementById('loading').style.display = 'none';
 
             if (categories.length === 0) {
-                container.innerHTML = '<div class="text-center py-20 text-gray-400">暂无内容，请前往后台添加。</div>';
+                container.innerHTML = `
+                    <div class="text-center py-24 glass border-white/5 mx-auto max-w-sm fade-in">
+                        <i data-lucide="shield-alert" class="w-12 h-12 text-gray-600 mx-auto mb-4"></i>
+                        <div class="text-gray-500 orbitron tracking-[0.3em] uppercase text-xs">
+                            No results found
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
                 return;
             }
 
-            categories.forEach(cat => {
+            categories.forEach((cat, index) => {
                 const section = document.createElement('section');
-                section.className = 'category-section';
+                section.className = 'category-section fade-in';
+                section.style.animationDelay = `${index * 0.1}s`;
 
                 const titleHtml = `
-                    <div class="flex items-center mb-6">
-                        <h2 class="category-title text-xl font-bold tracking-wider text-white uppercase">${cat.name}</h2>
-                        <div class="flex-grow ml-6 h-[1px] bg-white/10"></div>
+                    <div class="flex items-center mb-8 px-2">
+                        <div class="flex items-center space-x-3">
+                             <div class="w-1 h-4 bg-cyan-400 shadow-[0_0_8px_rgba(0,243,255,0.8)]"></div>
+                             <h2 class="text-sm font-bold tracking-[0.4em] text-cyan-400 uppercase orbitron">${cat.name}</h2>
+                        </div>
+                        <div class="flex-grow ml-6 h-[1px] bg-gradient-to-r from-cyan-400/20 to-transparent"></div>
+                        <span class="ml-4 text-[10px] mono text-gray-600 uppercase tracking-widest">${cat.links.length} Units</span>
                     </div>
                 `;
 
                 const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4';
+                grid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4';
 
-                cat.links.forEach(link => {
+                cat.links.forEach((link, lIndex) => {
                     const card = document.createElement('a');
                     card.href = link.url;
                     card.target = '_blank';
-                    card.className = 'link-card glass p-4 flex items-center space-x-3 group';
+                    card.className = 'link-card glass p-4 flex flex-col items-center text-center group h-full cursor-pointer';
                     
                     const iconUrl = link.icon || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(link.url).hostname}`;
                     
                     card.innerHTML = `
-                        <div class="w-10 h-10 rounded-lg bg-black/40 flex items-center justify-center overflow-hidden border border-white/5 group-hover:border-cyan-500/50">
-                            <img src="${iconUrl}" alt="${link.title}" class="w-6 h-6 object-contain" onerror="this.src='https://lucide.dev/api/icon/globe?color=fff'">
+                        <div class="icon-container w-14 h-14 rounded-2xl bg-black/40 flex items-center justify-center overflow-hidden mb-4 border border-white/5 transition-all shadow-inner">
+                            <img src="${iconUrl}" alt="${link.title}" class="w-8 h-8 object-contain opacity-70 group-hover:opacity-100 transition-opacity" onerror="this.src='https://favicon.png.pub/v1/${new URL(link.url).hostname}'">
                         </div>
-                        <div class="flex-grow overflow-hidden">
-                            <h3 class="text-sm font-medium text-white truncate group-hover:text-cyan-400 transition-colors">${link.title}</h3>
-                            <p class="text-[10px] text-gray-500 truncate mt-0.5">${new URL(link.url).hostname}</p>
+                        <div class="w-full">
+                            <h3 class="text-sm font-bold text-gray-200 truncate group-hover:text-cyan-400 transition-colors uppercase orbitron tracking-wider">${link.title}</h3>
+                            <p class="text-[10px] text-gray-500 truncate mt-1 opacity-60 group-hover:opacity-100 mono">${new URL(link.url).hostname.replace('www.', '')}</p>
                         </div>
                     `;
                     grid.appendChild(card);
