@@ -26,7 +26,7 @@ export async function onRequestPost(context) {
     const { token } = body;
 
     if (!token) {
-        return new Response("Unauthorized", { status: 401 });
+        return new Response("未授权访问", { status: 401 });
     }
 
     const mapping = {

@@ -20,7 +20,7 @@ export async function onRequestPost(context) {
     const body = await request.json();
     const { type, action, token, data } = body;
 
-    if (!token) return new Response("Unauthorized", { status: 401 });
+    if (!token) return new Response("未授权访问", { status: 401 });
 
     if (type === 'category') {
         if (action === 'add') {

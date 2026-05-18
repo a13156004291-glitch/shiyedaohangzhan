@@ -76,10 +76,10 @@
         <div id="login-bg" class="absolute inset-0 bg-black opacity-80 transition-opacity"></div>
         <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 theme-border relative z-10">
                 <h1 id="login-title" class="orbitron text-3xl font-bold site-title-themed mb-2 text-center tracking-tighter">身份验证</h1>
-                <p class="text-gray-500 text-[10px] orbitron mb-8 text-center tracking-[0.2em]">ACCESS CLOUD CONSOLE</p>
-                <input type="text" id="username-input" placeholder="ADMIN USER" class="input-dark orbitron text-center mb-4">
-                <input type="password" id="password-input" placeholder="PASSKEY" class="input-dark orbitron text-center mb-6">
-                <button onclick="login()" class="w-full btn-neon py-4 rounded-lg orbitron tracking-widest theme-glow">INITIALIZE_CONNECTION</button>
+                <p class="text-gray-500 text-[10px] orbitron mb-8 text-center tracking-[0.2em]">进入云端控制台</p>
+                <input type="text" id="username-input" placeholder="账号" class="input-dark orbitron text-center mb-4">
+                <input type="password" id="password-input" placeholder="访问密钥" class="input-dark orbitron text-center mb-6">
+                <button onclick="login()" class="w-full btn-neon py-4 rounded-lg orbitron tracking-widest theme-glow">初始化连接</button>
             <p id="login-error" class="text-red-500 text-[10px] orbitron mt-6 text-center hidden uppercase tracking-widest"></p>
         </div>
     </div>
@@ -168,7 +168,7 @@
             <div class="lg:col-span-8">
                 <div id="categories-list" class="space-y-10">
                     <!-- Loading state -->
-                    <div class="text-center py-20 orbitron text-gray-600 animate-pulse tracking-widest">CONNECTING_TO_D1_STREAMS...</div>
+                    <div class="text-center py-20 orbitron text-gray-600 animate-pulse tracking-widest">正在连接数据库流...</div>
                 </div>
             </div>
         </div>
@@ -180,8 +180,8 @@
             <div class="absolute -top-10 -right-10 p-4 opacity-[0.03] pointer-events-none rotate-12">
                 <i data-lucide="layout" class="w-64 h-64"></i>
             </div>
-            <h2 id="modal-title" class="orbitron text-2xl font-bold theme-text mb-2 uppercase tracking-tighter">DATA UNIT EDITOR</h2>
-            <p class="text-[10px] text-gray-500 orbitron mb-8 tracking-[0.3em]">MODIFIED_CLOUD_STREAM_SEGMENT</p>
+            <h2 id="modal-title" class="orbitron text-2xl font-bold theme-text mb-2 uppercase tracking-tighter">数据单元编辑器</h2>
+            <p class="text-[10px] text-gray-500 orbitron mb-8 tracking-[0.3em]">修改云端流片段</p>
             
             <div class="space-y-6 relative z-10">
                 <input type="hidden" id="link-id">
@@ -312,7 +312,7 @@
                 if (window.currentConfig) applyConfig(window.currentConfig);
             } else {
                 const errorEl = document.getElementById('login-error');
-                errorEl.innerText = data.message || "AUTHENTICATION FAILURE";
+                errorEl.innerText = data.message || "身份验证失败";
                 errorEl.classList.remove('hidden');
             }
         }

@@ -157,13 +157,13 @@
                     十夜导航系统
                 </h1>
                 <p class="theme-text opacity-60 tracking-[0.4em] uppercase text-[9px] md:text-xs">
-                    Lightweight Cyberpunk Navigation v1.0
+                    轻量级赛博导航 v1.0
                 </p>
             </header>
             
             <div id="clock-container" class="glass px-8 py-4 text-center">
                 <div id="clock-time" class="orbitron text-3xl md:text-4xl font-bold theme-text">00:00:00</div>
-                <div id="clock-date" class="mono text-[10px] text-gray-500 mt-1 uppercase tracking-widest">2026.05.18 MON</div>
+                <div id="clock-date" class="mono text-[10px] text-gray-500 mt-1 uppercase tracking-widest">2026年5月18日 星期一</div>
             </div>
         </div>
 
@@ -175,14 +175,14 @@
                     class="search-input w-full py-5 pl-14 pr-20 rounded-2xl glass text-base">
                 <div class="absolute right-5 top-1/2 -translate-y-1/2 hidden md:flex items-center space-x-2 text-gray-500 pointer-events-none">
                     <span class="keyboard-hint">/</span>
-                    <span class="text-[10px] uppercase font-bold orbitron">Search</span>
+                    <span class="text-[10px] uppercase font-bold orbitron">搜索</span>
                 </div>
             </div>
         </div>
 
         <div id="loading" class="flex flex-col justify-center items-center h-64 fade-in">
             <div class="loader"></div>
-            <p class="mt-4 text-gray-500 text-sm orbitron tracking-widest">LOADING DATABASE...</p>
+            <p class="mt-4 text-gray-500 text-sm orbitron tracking-widest">正在加载数据库...</p>
         </div>
 
         <div id="navigation-content" class="space-y-16">
@@ -190,10 +190,10 @@
         </div>
 
         <footer class="mt-32 text-center border-t border-white/5 pt-10 pb-10 fade-in">
-            <p class="text-gray-600 text-[10px] orbitron tracking-widest uppercase mb-2">Designed for the Dark</p>
-            <p class="text-gray-500 text-[10px]">&copy; 2026 TEN-NIGHT NAV. Power by Cloudflare D1</p>
+            <p class="text-gray-600 text-[10px] orbitron tracking-widest uppercase mb-2">为深夜而设计</p>
+            <p class="text-gray-500 text-[10px]">&copy; 2026 十夜导航. Power by Cloudflare D1</p>
             <div class="mt-4 flex justify-center space-x-6">
-                <a href="/admin.html" class="text-gray-500 hover:theme-text transition-colors text-[10px] uppercase tracking-widest">Access Console</a>
+                <a href="/admin.html" class="text-gray-500 hover:theme-text transition-colors text-[10px] uppercase tracking-widest">进入管理控制台</a>
             </div>
         </footer>
     </div>
@@ -226,12 +226,12 @@
         function updateClock() {
             const now = new Date();
             const time = now.toLocaleTimeString('zh-CN', { hour12: false });
-            const dateStr = now.toLocaleDateString('en-US', { 
+            const dateStr = now.toLocaleDateString('zh-CN', { 
                 year: 'numeric', 
-                month: '2-digit', 
-                day: '2-digit',
-                weekday: 'short'
-            }).replace(/\//g, '.').toUpperCase();
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            });
             
             document.getElementById('clock-time').innerText = time;
             document.getElementById('clock-date').innerText = dateStr;
@@ -278,8 +278,8 @@
                 console.error("Initialization Failed:", err);
                 document.getElementById('loading').innerHTML = `
                     <div class="text-center p-8 glass border-red-500/20">
-                        <p class="text-red-400 font-bold mb-2">DATABASE INITIALIZATION ERROR</p>
-                        <p class="text-gray-500 text-xs uppercase tracking-widest">Please check system configuration and network status.</p>
+                        <p class="text-red-400 font-bold mb-2">数据库初始化错误</p>
+                        <p class="text-gray-500 text-xs uppercase tracking-widest">请检查系统配置和网络状态。</p>
                     </div>
                 `;
             }
@@ -317,7 +317,7 @@
                     <div class="text-center py-24 glass border-white/5 mx-auto max-w-sm fade-in">
                         <i data-lucide="shield-alert" class="w-12 h-12 text-gray-600 mx-auto mb-4"></i>
                         <div class="text-gray-500 orbitron tracking-[0.3em] uppercase text-xs">
-                            No results found
+                            未发现结果
                         </div>
                     </div>
                 `;
@@ -337,7 +337,7 @@
                              <h2 class="text-sm font-bold tracking-[0.4em] theme-text uppercase orbitron">${cat.name}</h2>
                         </div>
                         <div class="flex-grow ml-6 h-[1px] bg-gradient-to-r from-white/10 to-transparent"></div>
-                        <span class="ml-4 text-[10px] mono theme-text opacity-40 uppercase tracking-widest">${cat.links.length} Units</span>
+                        <span class="ml-4 text-[10px] mono theme-text opacity-40 uppercase tracking-widest">${cat.links.length} 个单元</span>
                     </div>
                 `;
 
