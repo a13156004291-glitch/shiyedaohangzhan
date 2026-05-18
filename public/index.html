@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>十夜导航系统 | 网址导航</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/font/lucide.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap');
+
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --glass-bg: rgba(10, 10, 20, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: #050510;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Noto Sans SC', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+        }
+
+        .link-card {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid transparent;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .category-title {
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .category-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background: linear-gradient(to bottom, var(--neon-blue), var(--neon-pink));
+            box-shadow: 0 0 8px var(--neon-blue);
+        }
+
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: var(--neon-pink);
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body id="body-bg">
+    <div id="bg-overlay" class="fixed inset-0 bg-black z-[-1]" style="opacity: 0.4;"></div>
+
+    <div class="container mx-auto px-4 py-8 relative z-10">
+        <header class="text-center mb-12">
+            <h1 class="orbitron text-4xl md:text-6xl font-bold neon-text mb-4">十夜导航系统</h1>
+            <p class="text-gray-400 tracking-widest uppercase text-sm">轻量级赛博朋克导航系统 v1.0</p>
+        </header>
+
+        <div id="loading" class="flex justify-center items-center h-64">
+            <span class="loader"></span>
+        </div>
+
+        <div id="navigation-content" class="space-y-12">
+            <!-- 分类内容将由 JS 渲染 -->
+        </div>
+
+        <footer class="mt-20 text-center text-gray-500 text-xs pb-10">
+            <p>&copy; 2026 十夜导航系统. 基于 Cloudflare D1 构建</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await init();
+        });
+
+        async function init() {
+            try {
+                // 加载背景
+                const configRes = await fetch('/api/config');
+                const config = await configRes.json();
+                if (config.backgroundUrl) {
+                    document.getElementById('body-bg').style.backgroundImage = `url('${config.backgroundUrl}')`;
+                }
+                if (config.backgroundOpacity !== undefined) {
+                    document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
+                }
+
+                // 加载链接数据
+                const linksRes = await fetch('/api/links');
+                const data = await linksRes.json();
+                
+                render(data);
+            } catch (err) {
+                console.error("Failed to load data:", err);
+                document.getElementById('loading').innerHTML = '<p class="text-red-500">加载失败，请检查数据库配置。</p>';
+            }
+        }
+
+        function render(categories) {
+            const container = document.getElementById('navigation-content');
+            container.innerHTML = '';
+            document.getElementById('loading').style.display = 'none';
+
+            if (categories.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 text-gray-400">暂无内容，请前往后台添加。</div>';
+                return;
+            }
+
+            categories.forEach(cat => {
+                const section = document.createElement('section');
+                section.className = 'category-section';
+
+                const titleHtml = `
+                    <div class="flex items-center mb-6">
+                        <h2 class="category-title text-xl font-bold tracking-wider text-white uppercase">${cat.name}</h2>
+                        <div class="flex-grow ml-6 h-[1px] bg-white/10"></div>
+                    </div>
+                `;
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4';
+
+                cat.links.forEach(link => {
+                    const card = document.createElement('a');
+                    card.href = link.url;
+                    card.target = '_blank';
+                    card.className = 'link-card glass p-4 flex items-center space-x-3 group';
+                    
+                    const iconUrl = link.icon || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(link.url).hostname}`;
+                    
+                    card.innerHTML = `
+                        <div class="w-10 h-10 rounded-lg bg-black/40 flex items-center justify-center overflow-hidden border border-white/5 group-hover:border-cyan-500/50">
+                            <img src="${iconUrl}" alt="${link.title}" class="w-6 h-6 object-contain" onerror="this.src='https://lucide.dev/api/icon/globe?color=fff'">
+                        </div>
+                        <div class="flex-grow overflow-hidden">
+                            <h3 class="text-sm font-medium text-white truncate group-hover:text-cyan-400 transition-colors">${link.title}</h3>
+                            <p class="text-[10px] text-gray-500 truncate mt-0.5">${new URL(link.url).hostname}</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                section.innerHTML = titleHtml;
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+        }
+    </script>
+</body>
+</html>

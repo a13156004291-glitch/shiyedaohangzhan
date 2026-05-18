@@ -1,0 +1,6 @@
+{
+  "name": "十夜导航系统",
+  "description": "A lightweight, cyberpunk-themed URL navigation system with a glassmorphism UI, built for Cloudflare Pages and D1.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

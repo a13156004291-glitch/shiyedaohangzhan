@@ -1,0 +1,7 @@
+name = "neon-navigator"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nav_db"
+database_id = "your-database-id-goes-here"

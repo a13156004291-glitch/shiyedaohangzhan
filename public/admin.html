@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>十夜导航 | 管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        body { background: #0a0a14; color: #fff; font-family: sans-serif; }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-neon { background: #00f3ff; color: #000; font-weight: bold; transition: all 0.3s; }
+        .btn-neon:hover { box-shadow: 0 0 20px #00f3ff; transform: scale(1.02); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div class="glass p-8 rounded-2xl w-full max-w-md">
+            <h1 class="orbitron text-2xl text-cyan-400 mb-6 text-center">系统身份验证</h1>
+            <input type="password" id="password-input" placeholder="输入管理密码" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg mb-4 text-white focus:outline-none focus:border-cyan-400">
+            <button onclick="login()" class="w-full btn-neon p-3 rounded-lg">验证身份</button>
+            <p id="login-error" class="text-red-500 text-sm mt-4 text-center hidden"></p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="admin-content" class="hidden container mx-auto max-w-6xl">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 border-b border-white/10 pb-6">
+            <h1 class="orbitron text-3xl font-bold tracking-tighter text-cyan-400 mb-4 md:mb-0">十夜导航.CONSOLE v1</h1>
+            <div class="flex space-x-4">
+                <button onclick="logout()" class="text-gray-400 hover:text-white transition-colors">退出登录</button>
+                <a href="/" target="_blank" class="text-cyan-400 hover:underline">返回首页 &nearr;</a>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar / Common Actions -->
+            <div class="space-y-6">
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">全局设置</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">背景图 URL</label>
+                            <input type="text" id="bg-url-input" class="w-full bg-black/40 border border-white/10 p-2 rounded text-sm mb-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-2 flex justify-between">
+                                <span>背景遮罩透明度</span>
+                                <span id="opacity-value">0.4</span>
+                            </label>
+                            <input type="range" id="bg-opacity-input" min="0" max="1" step="0.1" value="0.4" oninput="document.getElementById('opacity-value').innerText = this.value" class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                        </div>
+                        <button onclick="updateSettings()" class="w-full btn-neon p-2 rounded text-xs transition">保存基础配置</button>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">添加分类</h2>
+                    <input type="text" id="cat-name-input" placeholder="分类名称" class="w-full bg-black/40 border border-white/10 p-2 rounded text-sm mb-2">
+                    <button onclick="addCategory()" class="w-full btn-neon p-2 rounded text-xs">新建分类</button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="lg:col-span-3">
+                <div id="categories-list" class="space-y-8">
+                    <!-- Categories and their links will render here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Link Modal (Hidden by default) -->
+    <div id="link-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-40 p-4">
+        <div class="glass p-8 rounded-2xl w-full max-w-xl">
+            <h2 id="modal-title" class="orbitron text-xl text-cyan-400 mb-6 uppercase">内容编辑器</h2>
+            <div class="space-y-4">
+                <input type="hidden" id="link-id">
+                <input type="hidden" id="link-cat-id">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">站点名称</label>
+                    <input type="text" id="link-title" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">URL 链接</label>
+                    <input type="text" id="link-url" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">图标 URL (不填则自动抓取)</label>
+                    <input type="text" id="link-icon" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">排序权重 (越小越靠前)</label>
+                    <input type="number" id="link-order" value="0" class="w-full bg-white/10 border border-white/20 p-3 rounded-lg">
+                </div>
+                <div class="flex space-x-4 mt-6">
+                    <button onclick="saveLink()" class="flex-grow btn-neon p-3 rounded-lg">提交保存</button>
+                    <button onclick="closeModal()" class="bg-gray-700 p-3 rounded-lg">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = localStorage.getItem('neon_token');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (currentToken) {
+                showAdmin();
+            }
+        });
+
+        async function login() {
+            const password = document.getElementById('password-input').value;
+            const res = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                currentToken = data.token;
+                localStorage.setItem('neon_token', currentToken);
+                showAdmin();
+            } else {
+                const errorEl = document.getElementById('login-error');
+                errorEl.innerText = data.message;
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('neon_token');
+            window.location.reload();
+        }
+
+        function showAdmin() {
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('admin-content').classList.remove('hidden');
+            loadData();
+        }
+
+        async function loadData() {
+            const res = await fetch('/api/links');
+            const data = await res.json();
+            
+            const configRes = await fetch('/api/config');
+            const config = await configRes.json();
+            document.getElementById('bg-url-input').value = config.backgroundUrl || '';
+            document.getElementById('bg-opacity-input').value = config.backgroundOpacity || '0.4';
+            document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
+
+            renderAdminList(data);
+        }
+
+        function renderAdminList(categories) {
+            const container = document.getElementById('categories-list');
+            container.innerHTML = '';
+
+            categories.forEach(cat => {
+                const catDiv = document.createElement('div');
+                catDiv.className = 'glass p-6 rounded-xl relative overflow-hidden';
+                
+                catDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <input type="text" value="${cat.name}" onchange="updateCat(${cat.id}, this.value, ${cat.order_index})" class="bg-transparent border-b border-cyan-500/20 text-xl font-bold focus:outline-none focus:border-cyan-400">
+                        <div class="flex items-center space-x-3">
+                            <button onclick="openLinkModal(${cat.id})" class="text-xs text-cyan-400 border border-cyan-400 px-3 py-1 rounded-full hover:bg-cyan-400 hover:text-black transition">+ 添加书签</button>
+                            <button onclick="deleteCat(${cat.id})" class="text-xs text-red-400 hover:bg-red-400/10 px-2 py-1 rounded transition">删除分类</button>
+                        </div>
+                    </div>
+                `;
+
+                const linksGrid = document.createElement('div');
+                linksGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+
+                cat.links.forEach(link => {
+                    const lDiv = document.createElement('div');
+                    lDiv.className = 'bg-black/40 border border-white/5 p-3 rounded-lg flex items-center justify-between group';
+                    lDiv.innerHTML = `
+                        <div class="flex items-center space-x-3 overflow-hidden">
+                            <img src="${link.icon || '/favicon.ico'}" class="w-8 h-8 rounded" onerror="this.src='https://lucide.dev/api/icon/globe?color=fff'">
+                            <div class="truncate">
+                                <p class="text-sm font-medium title-el">${link.title}</p>
+                                <p class="text-[10px] text-gray-500 truncate">${link.url}</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
+                            <button onclick="editLink(${JSON.stringify(link).replace(/"/g, '&quot;')})" class="text-xs p-1 hover:text-cyan-400">编辑</button>
+                            <button onclick="deleteLink(${link.id})" class="text-xs p-1 hover:text-red-400">删除</button>
+                        </div>
+                    `;
+                    linksGrid.appendChild(lDiv);
+                });
+
+                catDiv.appendChild(linksGrid);
+                container.appendChild(catDiv);
+            });
+        }
+
+        // --- Generic API Wrapper ---
+        async function api(type, action, data) {
+            const res = await fetch('/api/links', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type, action, token: currentToken, data })
+            });
+            if (res.status === 401) logout();
+            loadData();
+        }
+
+        // --- Category handlers ---
+        function addCategory() {
+            const name = document.getElementById('cat-name-input').value;
+            if (!name) return;
+            api('category', 'add', { name });
+            document.getElementById('cat-name-input').value = '';
+        }
+
+        function updateCat(id, name, order_index) {
+            api('category', 'update', { id, name, order_index });
+        }
+
+        function deleteCat(id) {
+            if (confirm("确定要删除整个分类吗？分类下的网址也将消失。")) {
+                api('category', 'delete', { id });
+            }
+        }
+
+        // --- Link Modal ---
+        function openLinkModal(catId) {
+            document.getElementById('link-modal').style.display = 'flex';
+            document.getElementById('link-cat-id').value = catId;
+            document.getElementById('link-id').value = '';
+            document.getElementById('link-title').value = '';
+            document.getElementById('link-url').value = '';
+            document.getElementById('link-icon').value = '';
+            document.getElementById('link-order').value = '0';
+        }
+
+        function editLink(link) {
+            document.getElementById('link-modal').style.display = 'flex';
+            document.getElementById('link-id').value = link.id;
+            document.getElementById('link-cat-id').value = link.category_id;
+            document.getElementById('link-title').value = link.title;
+            document.getElementById('link-url').value = link.url;
+            document.getElementById('link-icon').value = link.icon || '';
+            document.getElementById('link-order').value = link.order_index;
+        }
+
+        function closeModal() {
+            document.getElementById('link-modal').style.display = 'none';
+        }
+
+        function saveLink() {
+            const data = {
+                id: document.getElementById('link-id').value,
+                category_id: document.getElementById('link-cat-id').value,
+                title: document.getElementById('link-title').value,
+                url: document.getElementById('link-url').value,
+                icon: document.getElementById('link-icon').value,
+                order_index: parseInt(document.getElementById('link-order').value) || 0
+            };
+            const action = data.id ? 'update' : 'add';
+            api('link', action, data);
+            closeModal();
+        }
+
+        function deleteLink(id) {
+            if (confirm("删除这个书签？")) {
+                api('link', 'delete', { id });
+            }
+        }
+
+        async function updateSettings() {
+            const backgroundUrl = document.getElementById('bg-url-input').value;
+            const backgroundOpacity = document.getElementById('bg-opacity-input').value;
+            const res = await fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    backgroundUrl, 
+                    backgroundOpacity, 
+                    token: currentToken 
+                })
+            });
+            if (res.ok) alert("配置已保存");
+        }
+    </script>
+</body>
+</html>
