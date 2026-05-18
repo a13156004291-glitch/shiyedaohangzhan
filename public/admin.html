@@ -61,6 +61,7 @@
         <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 border-cyan-400">
             <h1 class="orbitron text-3xl font-bold text-white mb-2 text-center tracking-tighter">系统身份验证</h1>
             <p class="text-gray-500 text-[10px] orbitron mb-8 text-center tracking-[0.2em]">正在访问控制台入口</p>
+            <input type="text" id="username-input" placeholder="管理账号" class="input-dark orbitron text-center mb-4">
             <input type="password" id="password-input" placeholder="访问校验码" class="input-dark orbitron text-center mb-6">
             <button onclick="login()" class="w-full btn-neon py-4 rounded-lg orbitron tracking-widest">初始化访问</button>
             <p id="login-error" class="text-red-500 text-[10px] orbitron mt-6 text-center hidden uppercase tracking-widest"></p>
@@ -93,6 +94,10 @@
                     </h2>
                     <div class="space-y-5">
                         <div>
+                            <label class="block text-[10px] text-gray-500 mb-2 orbitron uppercase tracking-widest">站点名称</label>
+                            <input type="text" id="site-name-input" class="input-dark text-xs">
+                        </div>
+                        <div>
                             <label class="block text-[10px] text-gray-500 mb-2 orbitron uppercase tracking-widest">背景图 URL</label>
                             <input type="text" id="bg-url-input" class="input-dark text-xs">
                         </div>
@@ -109,6 +114,17 @@
                                 <span id="card-opacity-value" class="text-cyan-400">0.8</span>
                             </label>
                             <input type="range" id="card-opacity-input" min="0" max="1" step="0.05" value="0.8" oninput="document.getElementById('card-opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                        </div>
+                        <div class="pt-4 border-t border-white/5 space-y-4">
+                            <h3 class="text-[9px] orbitron text-gray-500 tracking-widest uppercase">账户凭据管理</h3>
+                            <div>
+                                <label class="block text-[9px] text-gray-600 mb-1 uppercase">管理用户名</label>
+                                <input type="text" id="admin-user-input" class="input-dark text-xs py-2">
+                            </div>
+                            <div>
+                                <label class="block text-[9px] text-gray-600 mb-1 uppercase">修改密码</label>
+                                <input type="password" id="admin-pass-input" placeholder="留空则不修改" class="input-dark text-xs py-2">
+                            </div>
                         </div>
                         <button onclick="updateSettings()" class="w-full btn-neon py-3 rounded text-[11px] orbitron tracking-widest transition">提交系统更改</button>
                     </div>
@@ -186,11 +202,12 @@
         });
 
         async function login() {
+            const username = document.getElementById('username-input').value;
             const password = document.getElementById('password-input').value;
             const res = await fetch('/api/auth', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
+                body: JSON.stringify({ username, password })
             });
             const data = await res.json();
             if (data.success) {
@@ -239,6 +256,9 @@
                 document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
                 document.getElementById('card-opacity-input').value = config.cardOpacity || '0.8';
                 document.getElementById('card-opacity-value').innerText = config.cardOpacity || '0.8';
+                
+                document.getElementById('site-name-input').value = config.siteName || '';
+                document.getElementById('admin-user-input').value = config.adminUsername || '';
 
                 renderAdminList(data);
             } catch (e) {
@@ -384,6 +404,10 @@
             const backgroundUrl = document.getElementById('bg-url-input').value;
             const backgroundOpacity = document.getElementById('bg-opacity-input').value;
             const cardOpacity = document.getElementById('card-opacity-input').value;
+            const siteName = document.getElementById('site-name-input').value;
+            const adminUsername = document.getElementById('admin-user-input').value;
+            const adminPassword = document.getElementById('admin-pass-input').value;
+
             const res = await fetch('/api/config', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -391,14 +415,21 @@
                     backgroundUrl, 
                     backgroundOpacity, 
                     cardOpacity,
+                    siteName,
+                    adminUsername,
+                    adminPassword,
                     token: currentToken 
                 })
             });
             if (res.ok) {
-                document.body.style.backgroundImage = `url('${backgroundUrl}')`;
+                if (backgroundUrl) document.body.style.backgroundImage = `url('${backgroundUrl}')`;
                 document.getElementById('bg-overlay').style.opacity = backgroundOpacity;
                 document.documentElement.style.setProperty('--glass-opacity', cardOpacity);
                 alert("系统配置已更新");
+                if (adminPassword) {
+                    alert("密码已更改，请重新登录");
+                    logout();
+                }
             }
         }
     </script>

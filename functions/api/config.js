@@ -3,11 +3,15 @@ export async function onRequestGet(context) {
     const backgroundUrl = await env.DB.prepare("SELECT value FROM config WHERE key = 'background_url'").first("value");
     const backgroundOpacity = await env.DB.prepare("SELECT value FROM config WHERE key = 'background_opacity'").first("value");
     const cardOpacity = await env.DB.prepare("SELECT value FROM config WHERE key = 'card_opacity'").first("value");
+    const siteName = await env.DB.prepare("SELECT value FROM config WHERE key = 'site_name'").first("value");
+    const adminUsername = await env.DB.prepare("SELECT value FROM config WHERE key = 'admin_username'").first("value");
     
     return new Response(JSON.stringify({ 
         backgroundUrl, 
         backgroundOpacity: backgroundOpacity || "0.4",
-        cardOpacity: cardOpacity || "0.6"
+        cardOpacity: cardOpacity || "0.6",
+        siteName: siteName || "十夜导航系统",
+        adminUsername: adminUsername || "admin"
     }), {
         headers: { "Content-Type": "application/json" }
     });
@@ -15,7 +19,7 @@ export async function onRequestGet(context) {
 
 export async function onRequestPost(context) {
     const { request, env } = context;
-    const { backgroundUrl, backgroundOpacity, cardOpacity, token } = await request.json();
+    const { backgroundUrl, backgroundOpacity, cardOpacity, siteName, adminUsername, adminPassword, token } = await request.json();
 
     // 简单鉴权校验（实际应校验 token）
     if (!token) {
@@ -37,6 +41,24 @@ export async function onRequestPost(context) {
     if (cardOpacity !== undefined) {
         await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'card_opacity'")
             .bind(String(cardOpacity))
+            .run();
+    }
+
+    if (siteName !== undefined) {
+        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'site_name'")
+            .bind(siteName)
+            .run();
+    }
+
+    if (adminUsername !== undefined && adminUsername.trim() !== "") {
+        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'admin_username'")
+            .bind(adminUsername)
+            .run();
+    }
+
+    if (adminPassword !== undefined && adminPassword.trim() !== "") {
+        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'admin_password'")
+            .bind(adminPassword)
             .run();
     }
 
