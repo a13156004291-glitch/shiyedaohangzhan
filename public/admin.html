@@ -52,7 +52,7 @@
         .btn-neon:hover { box-shadow: 0 0 20px var(--theme-color); transform: scale(1.02); }
         
         .input-dark {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, calc(var(--glass-opacity) * 0.7));
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
             padding: 0.75rem;
@@ -209,8 +209,8 @@
                 </div>
                 
                 <div class="flex space-x-4 mt-10">
-                    <button onclick="saveLink()" class="flex-grow btn-neon py-4 rounded-lg orbitron tracking-widest">提交保存</button>
-                    <button onclick="closeModal()" class="bg-white/5 border border-white/10 hover:bg-white/10 px-6 py-4 rounded-lg orbitron tracking-widest text-[11px]">中止</button>
+                    <button onclick="saveLink()" class="flex-grow btn-neon py-4 rounded-lg orbitron tracking-widest theme-glow">提交保存</button>
+                    <button onclick="closeModal()" class="bg-white/5 border border-white/10 hover:theme-border/40 hover:theme-text px-6 py-4 rounded-lg orbitron tracking-widest text-[11px] transition-all">中止</button>
                 </div>
             </div>
         </div>
@@ -308,6 +308,8 @@
                 currentToken = data.token;
                 localStorage.setItem('neon_token', currentToken);
                 showAdmin();
+                // Ensure config is applied to the newly visible UI
+                if (window.currentConfig) applyConfig(window.currentConfig);
             } else {
                 const errorEl = document.getElementById('login-error');
                 errorEl.innerText = data.message || "AUTHENTICATION FAILURE";
