@@ -3,5 +3,5 @@ pages_build_output_dir = "public"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "nav_db"
+database_name = "danhang"  # 修正为截图中的名字
 database_id = "a76debe2-3de1-4ef9-b789-609fc3d46b79"
