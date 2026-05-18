@@ -194,12 +194,44 @@
     <script>
         let currentToken = localStorage.getItem('neon_token');
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Apply background before everything else
+            await fetchSystemConfig();
+            
             if (currentToken) {
                 showAdmin();
             }
             lucide.createIcons();
         });
+
+        async function fetchSystemConfig() {
+            try {
+                const res = await fetch('/api/config');
+                const config = await res.json();
+                
+                if (config.backgroundUrl) {
+                    document.body.style.backgroundImage = `url('${config.backgroundUrl}')`;
+                }
+                if (config.backgroundOpacity !== undefined) {
+                    document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
+                }
+                if (config.cardOpacity !== undefined) {
+                    document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
+                }
+
+                if (document.getElementById('bg-url-input')) {
+                    document.getElementById('bg-url-input').value = config.backgroundUrl || '';
+                    document.getElementById('bg-opacity-input').value = config.backgroundOpacity || '0.4';
+                    document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
+                    document.getElementById('card-opacity-input').value = config.cardOpacity || '0.8';
+                    document.getElementById('card-opacity-value').innerText = config.cardOpacity || '0.8';
+                    document.getElementById('site-name-input').value = config.siteName || '';
+                    document.getElementById('admin-user-input').value = config.adminUsername || '';
+                }
+            } catch (e) {
+                console.error("Initial config load failed", e);
+            }
+        }
 
         async function login() {
             const username = document.getElementById('username-input').value;
@@ -237,28 +269,8 @@
                 const res = await fetch('/api/links');
                 const data = await res.json();
                 
-                const configRes = await fetch('/api/config');
-                const config = await configRes.json();
-                
-                // Apply background
-                if (config.backgroundUrl) {
-                    document.body.style.backgroundImage = `url('${config.backgroundUrl}')`;
-                }
-                if (config.backgroundOpacity !== undefined) {
-                    document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
-                }
-                if (config.cardOpacity !== undefined) {
-                    document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
-                }
-
-                document.getElementById('bg-url-input').value = config.backgroundUrl || '';
-                document.getElementById('bg-opacity-input').value = config.backgroundOpacity || '0.4';
-                document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
-                document.getElementById('card-opacity-input').value = config.cardOpacity || '0.8';
-                document.getElementById('card-opacity-value').innerText = config.cardOpacity || '0.8';
-                
-                document.getElementById('site-name-input').value = config.siteName || '';
-                document.getElementById('admin-user-input').value = config.adminUsername || '';
+                // Config already applied by fetchSystemConfig, but we refresh the inputs here
+                await fetchSystemConfig();
 
                 renderAdminList(data);
             } catch (e) {
