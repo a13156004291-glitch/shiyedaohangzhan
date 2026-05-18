@@ -69,9 +69,9 @@
     
     <!-- Login Overlay -->
     <div id="login-overlay" class="fixed inset-0 flex items-center justify-center z-50">
-        <div id="login-bg" class="absolute inset-0 bg-black opacity-40 transition-opacity"></div>
+        <div id="login-bg" class="absolute inset-0 bg-black opacity-90 transition-opacity"></div>
         <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 border-cyan-400 relative z-10 theme-border">
-            <h1 id="login-title" class="orbitron text-3xl font-bold text-white mb-2 text-center tracking-tighter">系统身份验证</h1>
+            <h1 id="login-title" class="orbitron text-3xl font-bold theme-text mb-2 text-center tracking-tighter">系统身份验证</h1>
             <p class="text-gray-500 text-[10px] orbitron mb-8 text-center tracking-[0.2em]">正在访问控制台入口</p>
             <input type="text" id="username-input" placeholder="管理账号" class="input-dark orbitron text-center mb-4">
             <input type="password" id="password-input" placeholder="访问校验码" class="input-dark orbitron text-center mb-6">
@@ -241,15 +241,19 @@
                 if (config.backgroundUrl) {
                     document.body.style.backgroundImage = `url('${config.backgroundUrl}')`;
                 }
+
                 if (config.backgroundOpacity !== undefined) {
                     document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
-                    // Apply opacity logic to login backdrop
+                    // Login backdrop follows system background overlay for consistency
                     const loginBg = document.getElementById('login-bg');
-                    if (loginBg) loginBg.style.opacity = Math.max(0.4, 1 - (config.backgroundOpacity * 0.8)); 
+                    if (loginBg) {
+                        loginBg.style.opacity = Math.max(0.6, config.backgroundOpacity); 
+                    }
                 }
-                if (config.cardOpacity !== undefined) {
+                if (config.cardOpacity !== undefined && config.cardOpacity !== "") {
                     document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
                 }
+
                 if (config.siteName) {
                     document.title = config.siteName + " - 管理后台";
                     if (document.getElementById('login-title')) {
