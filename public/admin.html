@@ -8,6 +8,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap');
         :root {
+            --neon-blue: #00f3ff;
+            --theme-color: var(--neon-blue);
+            --theme-color-rgb: 0, 243, 255;
             --glass-opacity: 0.6;
         }
         body { 
@@ -19,6 +22,11 @@
             background-attachment: fixed;
             min-height: 100vh;
         }
+
+        .theme-text { color: var(--theme-color); }
+        .theme-bg { background-color: var(--theme-color); }
+        .theme-border { border-color: var(--theme-color); }
+        .theme-glow { box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.5); }
         .orbitron { font-family: 'Orbitron', sans-serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         
@@ -36,8 +44,8 @@
         }
 
         .glass { background: rgba(10, 10, 20, var(--glass-opacity)); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); }
-        .btn-neon { background: #00f3ff; color: #000; font-weight: bold; transition: all 0.3s; }
-        .btn-neon:hover { box-shadow: 0 0 20px #00f3ff; transform: scale(1.02); }
+        .btn-neon { background: var(--theme-color); color: #000; font-weight: bold; transition: all 0.3s; }
+        .btn-neon:hover { box-shadow: 0 0 20px var(--theme-color); transform: scale(1.02); }
         
         .input-dark {
             background: rgba(0, 0, 0, 0.4);
@@ -50,9 +58,9 @@
         }
         .input-dark:focus {
             outline: none;
-            border-color: #00f3ff;
+            border-color: var(--theme-color);
             background: rgba(0, 0, 0, 0.6);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2);
         }
     </style>
 </head>
@@ -60,9 +68,9 @@
     <div id="bg-overlay" class="fixed inset-0 bg-black z-[-1]" style="opacity: 0.5;"></div>
     
     <!-- Login Overlay -->
-    <div id="login-overlay" class="fixed inset-0 bg-black flex items-center justify-center z-50">
-        <div id="login-bg" class="absolute inset-0 bg-black opacity-90 transition-opacity"></div>
-        <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 border-cyan-400 relative z-10">
+    <div id="login-overlay" class="fixed inset-0 flex items-center justify-center z-50">
+        <div id="login-bg" class="absolute inset-0 bg-black opacity-40 transition-opacity"></div>
+        <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 border-cyan-400 relative z-10 theme-border">
             <h1 id="login-title" class="orbitron text-3xl font-bold text-white mb-2 text-center tracking-tighter">系统身份验证</h1>
             <p class="text-gray-500 text-[10px] orbitron mb-8 text-center tracking-[0.2em]">正在访问控制台入口</p>
             <input type="text" id="username-input" placeholder="管理账号" class="input-dark orbitron text-center mb-4">
@@ -76,11 +84,11 @@
     <div id="admin-content" class="hidden container mx-auto max-w-6xl px-4 py-12">
         <header class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/5 pb-8">
             <div>
-                <h1 class="orbitron text-4xl font-bold tracking-tighter text-white mb-1 uppercase">十夜导航<span class="text-cyan-400">.管理后台</span></h1>
+                <h1 class="orbitron text-4xl font-bold tracking-tighter text-white mb-1 uppercase">十夜导航<span class="theme-text">.管理后台</span></h1>
                 <p class="text-[10px] text-gray-500 orbitron tracking-[0.4em] uppercase">控制与数据管理子系统 v1.2</p>
             </div>
             <div class="flex items-center space-x-6 mt-6 md:mt-0">
-                <a href="/" target="_blank" class="text-[10px] orbitron tracking-[0.2em] text-cyan-400 hover:text-white transition-colors border-b border-cyan-400/20 pb-1">预览前台</a>
+                <a href="/" target="_blank" class="text-[10px] orbitron tracking-[0.2em] theme-text hover:text-white transition-colors border-b theme-border/20 pb-1">预览前台</a>
                 <button onclick="logout()" class="text-[10px] orbitron tracking-[0.2em] text-red-400 hover:text-red-300 transition-colors">退出登录</button>
             </div>
         </header>
@@ -92,8 +100,8 @@
                     <div class="absolute top-0 right-0 p-2 opacity-5">
                         <i data-lucide="settings" class="w-20 h-20"></i>
                     </div>
-                    <h2 class="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-6 flex items-center">
-                        <span class="w-2 h-2 bg-cyan-400 mr-3 animate-pulse"></span>
+                    <h2 class="text-[11px] font-bold uppercase tracking-[0.3em] theme-text mb-6 flex items-center">
+                        <span class="w-2 h-2 theme-bg mr-3 animate-pulse"></span>
                         系统全局设置
                     </h2>
                     <div class="space-y-5">
@@ -102,20 +110,27 @@
                             <input type="text" id="site-name-input" class="input-dark text-xs">
                         </div>
                         <div>
+                            <label class="block text-[10px] text-gray-500 mb-2 orbitron uppercase tracking-widest">主色调 (HEX)</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="theme-color-input" class="input-dark text-xs mono">
+                                <input type="color" id="theme-color-picker" class="w-12 h-10 bg-transparent border-none p-0 cursor-pointer" oninput="document.getElementById('theme-color-input').value = this.value">
+                            </div>
+                        </div>
+                        <div>
                             <label class="block text-[10px] text-gray-500 mb-2 orbitron uppercase tracking-widest">背景图 URL</label>
                             <input type="text" id="bg-url-input" class="input-dark text-xs">
                         </div>
                         <div>
                             <label class="block text-[10px] text-gray-500 mb-2 flex justify-between orbitron uppercase tracking-widest">
                                 <span>背景遮罩透明度</span>
-                                <span id="opacity-value" class="text-cyan-400">0.4</span>
+                                <span id="opacity-value" class="theme-text">0.4</span>
                             </label>
                             <input type="range" id="bg-opacity-input" min="0" max="1" step="0.05" value="0.4" oninput="document.getElementById('opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400">
                         </div>
                         <div>
                             <label class="block text-[10px] text-gray-500 mb-2 flex justify-between orbitron uppercase tracking-widest">
                                 <span>卡片磨砂透明度</span>
-                                <span id="card-opacity-value" class="text-cyan-400">0.8</span>
+                                <span id="card-opacity-value" class="theme-text">0.8</span>
                             </label>
                             <input type="range" id="card-opacity-input" min="0" max="1" step="0.05" value="0.8" oninput="document.getElementById('card-opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400">
                         </div>
@@ -213,14 +228,24 @@
                 const res = await fetch('/api/config');
                 const config = await res.json();
                 
+                if (config.themeColor) {
+                    document.documentElement.style.setProperty('--theme-color', config.themeColor);
+                    // Convert Hex to RGB
+                    const hex = config.themeColor.replace('#', '');
+                    const r = parseInt(hex.substring(0, 2), 16);
+                    const g = parseInt(hex.substring(2, 4), 16);
+                    const b = parseInt(hex.substring(4, 6), 16);
+                    document.documentElement.style.setProperty('--theme-color-rgb', `${r}, ${g}, ${b}`);
+                }
+
                 if (config.backgroundUrl) {
                     document.body.style.backgroundImage = `url('${config.backgroundUrl}')`;
                 }
                 if (config.backgroundOpacity !== undefined) {
                     document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
-                    // Apply the same opacity to login page backdrop for consistency
+                    // Apply opacity logic to login backdrop
                     const loginBg = document.getElementById('login-bg');
-                    if (loginBg) loginBg.style.opacity = 1 - (config.backgroundOpacity * 0.5); 
+                    if (loginBg) loginBg.style.opacity = Math.max(0.4, 1 - (config.backgroundOpacity * 0.8)); 
                 }
                 if (config.cardOpacity !== undefined) {
                     document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
@@ -232,7 +257,7 @@
                     }
                     const mainTitle = document.querySelector('h1.orbitron.text-4xl');
                     if (mainTitle) {
-                        mainTitle.innerHTML = config.siteName + '<span class="text-cyan-400">.管理后台</span>';
+                        mainTitle.innerHTML = config.siteName + '<span class="theme-text">.管理后台</span>';
                     }
                 }
 
@@ -244,6 +269,8 @@
                     document.getElementById('card-opacity-value').innerText = config.cardOpacity || '0.6';
                     document.getElementById('site-name-input').value = config.siteName || '';
                     document.getElementById('admin-user-input').value = config.adminUsername || '';
+                    document.getElementById('theme-color-input').value = config.themeColor || '#00f3ff';
+                    document.getElementById('theme-color-picker').value = config.themeColor || '#00f3ff';
                 }
             } catch (e) {
                 console.error("Initial config load failed", e);
@@ -311,13 +338,13 @@
                 catDiv.innerHTML = `
                     <div class="bg-white/5 px-8 py-4 flex justify-between items-center border-b border-white/5">
                         <div class="flex items-center space-x-4">
-                            <span class="w-1 h-4 bg-cyan-400"></span>
-                            <input type="text" value="${cat.name}" onchange="updateCat(${cat.id}, this.value, ${cat.order_index})" class="bg-transparent border-none text-sm font-bold orbitron text-white focus:outline-none focus:text-cyan-400 w-48 uppercase">
+                            <span class="w-1 h-4 theme-bg theme-glow"></span>
+                            <input type="text" value="${cat.name}" onchange="updateCat(${cat.id}, this.value, ${cat.order_index})" class="bg-transparent border-none text-sm font-bold orbitron text-white focus:outline-none focus:theme-text w-48 uppercase">
                             <span class="text-[9px] text-gray-600 orbitron">排序:</span>
-                            <input type="number" value="${cat.order_index}" onchange="updateCat(${cat.id}, '${cat.name}', this.value)" class="bg-black/40 border border-white/10 text-[10px] text-cyan-400 px-2 py-1 rounded w-16 focus:outline-none">
+                            <input type="number" value="${cat.order_index}" onchange="updateCat(${cat.id}, '${cat.name}', this.value)" class="bg-black/40 border border-white/10 text-[10px] theme-text px-2 py-1 rounded w-16 focus:outline-none">
                         </div>
                         <div class="flex items-center space-x-6">
-                            <button onclick="openLinkModal(${cat.id})" class="text-[10px] orbitron tracking-widest text-cyan-400 hover:text-white transition-colors">添加链接</button>
+                            <button onclick="openLinkModal(${cat.id})" class="text-[10px] orbitron tracking-widest theme-text hover:text-white transition-colors">添加链接</button>
                             <button onclick="deleteCat(${cat.id})" class="text-[10px] orbitron tracking-widest text-gray-600 hover:text-red-500 transition-colors">清理分类</button>
                         </div>
                     </div>
@@ -330,7 +357,7 @@
 
                 cat.links.forEach(link => {
                     const lDiv = document.createElement('div');
-                    lDiv.className = 'bg-black/40 border border-white/5 p-4 rounded-xl flex items-center justify-between group hover:border-cyan-400/30 transition-all';
+                    lDiv.className = 'bg-black/40 border border-white/5 p-4 rounded-xl flex items-center justify-between group hover:theme-border/30 transition-all';
                     lDiv.innerHTML = `
                         <div class="flex items-center space-x-4 overflow-hidden">
                             <div class="w-10 h-10 rounded-lg bg-black/60 flex items-center justify-center overflow-hidden border border-white/5">
@@ -342,7 +369,7 @@
                             </div>
                         </div>
                         <div class="flex space-x-3 opacity-0 group-hover:opacity-100 transition">
-                            <button onclick='editLink(${JSON.stringify(link).replace(/'/g, "&#39;")})' class="text-[9px] orbitron text-cyan-400 hover:scale-110 transition">编辑</button>
+                            <button onclick='editLink(${JSON.stringify(link).replace(/'/g, "&#39;")})' class="text-[9px] orbitron theme-text hover:scale-110 transition">编辑</button>
                             <button onclick="deleteLink(${link.id})" class="text-[9px] orbitron text-red-400 hover:scale-110 transition">删除</button>
                         </div>
                     `;
@@ -434,6 +461,7 @@
             const backgroundOpacity = document.getElementById('bg-opacity-input').value;
             const cardOpacity = document.getElementById('card-opacity-input').value;
             const siteName = document.getElementById('site-name-input').value;
+            const themeColor = document.getElementById('theme-color-input').value;
             const adminUsername = document.getElementById('admin-user-input').value;
             const adminPassword = document.getElementById('admin-pass-input').value;
 
@@ -445,6 +473,7 @@
                     backgroundOpacity, 
                     cardOpacity,
                     siteName,
+                    themeColor,
                     adminUsername,
                     adminPassword,
                     token: currentToken 
@@ -454,6 +483,14 @@
                 if (backgroundUrl) document.body.style.backgroundImage = `url('${backgroundUrl}')`;
                 document.getElementById('bg-overlay').style.opacity = backgroundOpacity;
                 document.documentElement.style.setProperty('--glass-opacity', cardOpacity);
+                if (themeColor) {
+                    document.documentElement.style.setProperty('--theme-color', themeColor);
+                    const hex = themeColor.replace('#', '');
+                    const r = parseInt(hex.substring(0, 2), 16);
+                    const g = parseInt(hex.substring(2, 4), 16);
+                    const b = parseInt(hex.substring(4, 6), 16);
+                    document.documentElement.style.setProperty('--theme-color-rgb', `${r}, ${g}, ${b}`);
+                }
                 alert("系统配置已更新");
                 if (adminPassword) {
                     alert("密码已更改，请重新登录");
