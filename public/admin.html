@@ -7,6 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        :root {
+            --glass-opacity: 0.6;
+        }
         body { 
             background: #050510; 
             color: #fff; 
@@ -32,7 +35,7 @@
             opacity: 0.2;
         }
 
-        .glass { background: rgba(10, 10, 20, var(--glass-opacity, 0.8)); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); }
+        .glass { background: rgba(10, 10, 20, var(--glass-opacity)); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); }
         .btn-neon { background: #00f3ff; color: #000; font-weight: bold; transition: all 0.3s; }
         .btn-neon:hover { box-shadow: 0 0 20px #00f3ff; transform: scale(1.02); }
         
@@ -57,9 +60,10 @@
     <div id="bg-overlay" class="fixed inset-0 bg-black z-[-1]" style="opacity: 0.5;"></div>
     
     <!-- Login Overlay -->
-    <div id="login-overlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-50">
-        <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 border-cyan-400">
-            <h1 class="orbitron text-3xl font-bold text-white mb-2 text-center tracking-tighter">系统身份验证</h1>
+    <div id="login-overlay" class="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div id="login-bg" class="absolute inset-0 bg-black opacity-90 transition-opacity"></div>
+        <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 border-cyan-400 relative z-10">
+            <h1 id="login-title" class="orbitron text-3xl font-bold text-white mb-2 text-center tracking-tighter">系统身份验证</h1>
             <p class="text-gray-500 text-[10px] orbitron mb-8 text-center tracking-[0.2em]">正在访问控制台入口</p>
             <input type="text" id="username-input" placeholder="管理账号" class="input-dark orbitron text-center mb-4">
             <input type="password" id="password-input" placeholder="访问校验码" class="input-dark orbitron text-center mb-6">
@@ -214,17 +218,30 @@
                 }
                 if (config.backgroundOpacity !== undefined) {
                     document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
+                    // Apply the same opacity to login page backdrop for consistency
+                    const loginBg = document.getElementById('login-bg');
+                    if (loginBg) loginBg.style.opacity = 1 - (config.backgroundOpacity * 0.5); 
                 }
                 if (config.cardOpacity !== undefined) {
                     document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
+                }
+                if (config.siteName) {
+                    document.title = config.siteName + " - 管理后台";
+                    if (document.getElementById('login-title')) {
+                        document.getElementById('login-title').innerText = config.siteName;
+                    }
+                    const mainTitle = document.querySelector('h1.orbitron.text-4xl');
+                    if (mainTitle) {
+                        mainTitle.innerHTML = config.siteName + '<span class="text-cyan-400">.管理后台</span>';
+                    }
                 }
 
                 if (document.getElementById('bg-url-input')) {
                     document.getElementById('bg-url-input').value = config.backgroundUrl || '';
                     document.getElementById('bg-opacity-input').value = config.backgroundOpacity || '0.4';
                     document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
-                    document.getElementById('card-opacity-input').value = config.cardOpacity || '0.8';
-                    document.getElementById('card-opacity-value').innerText = config.cardOpacity || '0.8';
+                    document.getElementById('card-opacity-input').value = config.cardOpacity || '0.6';
+                    document.getElementById('card-opacity-value').innerText = config.cardOpacity || '0.6';
                     document.getElementById('site-name-input').value = config.siteName || '';
                     document.getElementById('admin-user-input').value = config.adminUsername || '';
                 }
