@@ -12,7 +12,8 @@
         :root {
             --neon-blue: #00f3ff;
             --neon-pink: #ff00ff;
-            --glass-bg: rgba(10, 10, 20, 0.6);
+            --glass-opacity: 0.6;
+            --glass-bg: rgba(10, 10, 20, var(--glass-opacity));
             --glass-border: rgba(255, 255, 255, 0.08);
             --glow: 0 0 10px rgba(0, 243, 255, 0.5);
         }
@@ -228,6 +229,9 @@
                 }
                 if (config.backgroundOpacity !== undefined) {
                     document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
+                }
+                if (config.cardOpacity !== undefined) {
+                    document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
                 }
 
                 // 加载链接

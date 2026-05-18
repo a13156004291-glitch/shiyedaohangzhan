@@ -32,7 +32,7 @@
             opacity: 0.2;
         }
 
-        .glass { background: rgba(10, 10, 20, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); }
+        .glass { background: rgba(10, 10, 20, var(--glass-opacity, 0.8)); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); }
         .btn-neon { background: #00f3ff; color: #000; font-weight: bold; transition: all 0.3s; }
         .btn-neon:hover { box-shadow: 0 0 20px #00f3ff; transform: scale(1.02); }
         
@@ -102,6 +102,13 @@
                                 <span id="opacity-value" class="text-cyan-400">0.4</span>
                             </label>
                             <input type="range" id="bg-opacity-input" min="0" max="1" step="0.05" value="0.4" oninput="document.getElementById('opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-500 mb-2 flex justify-between orbitron uppercase tracking-widest">
+                                <span>卡片磨砂透明度</span>
+                                <span id="card-opacity-value" class="text-cyan-400">0.8</span>
+                            </label>
+                            <input type="range" id="card-opacity-input" min="0" max="1" step="0.05" value="0.8" oninput="document.getElementById('card-opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400">
                         </div>
                         <button onclick="updateSettings()" class="w-full btn-neon py-3 rounded text-[11px] orbitron tracking-widest transition">提交系统更改</button>
                     </div>
@@ -223,10 +230,15 @@
                 if (config.backgroundOpacity !== undefined) {
                     document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
                 }
+                if (config.cardOpacity !== undefined) {
+                    document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
+                }
 
                 document.getElementById('bg-url-input').value = config.backgroundUrl || '';
                 document.getElementById('bg-opacity-input').value = config.backgroundOpacity || '0.4';
                 document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
+                document.getElementById('card-opacity-input').value = config.cardOpacity || '0.8';
+                document.getElementById('card-opacity-value').innerText = config.cardOpacity || '0.8';
 
                 renderAdminList(data);
             } catch (e) {
@@ -252,6 +264,8 @@
                         <div class="flex items-center space-x-4">
                             <span class="w-1 h-4 bg-cyan-400"></span>
                             <input type="text" value="${cat.name}" onchange="updateCat(${cat.id}, this.value, ${cat.order_index})" class="bg-transparent border-none text-sm font-bold orbitron text-white focus:outline-none focus:text-cyan-400 w-48 uppercase">
+                            <span class="text-[9px] text-gray-600 orbitron">排序:</span>
+                            <input type="number" value="${cat.order_index}" onchange="updateCat(${cat.id}, '${cat.name}', this.value)" class="bg-black/40 border border-white/10 text-[10px] text-cyan-400 px-2 py-1 rounded w-16 focus:outline-none">
                         </div>
                         <div class="flex items-center space-x-6">
                             <button onclick="openLinkModal(${cat.id})" class="text-[10px] orbitron tracking-widest text-cyan-400 hover:text-white transition-colors">添加链接</button>
@@ -369,18 +383,21 @@
         async function updateSettings() {
             const backgroundUrl = document.getElementById('bg-url-input').value;
             const backgroundOpacity = document.getElementById('bg-opacity-input').value;
+            const cardOpacity = document.getElementById('card-opacity-input').value;
             const res = await fetch('/api/config', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     backgroundUrl, 
                     backgroundOpacity, 
+                    cardOpacity,
                     token: currentToken 
                 })
             });
             if (res.ok) {
                 document.body.style.backgroundImage = `url('${backgroundUrl}')`;
                 document.getElementById('bg-overlay').style.opacity = backgroundOpacity;
+                document.documentElement.style.setProperty('--glass-opacity', cardOpacity);
                 alert("系统配置已更新");
             }
         }
