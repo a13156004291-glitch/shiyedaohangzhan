@@ -27,6 +27,10 @@
         .theme-bg { background-color: var(--theme-color); }
         .theme-border { border-color: var(--theme-color); }
         .theme-glow { box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.5); }
+        .site-title-themed {
+            color: var(--theme-color);
+            text-shadow: 0 0 20px rgba(var(--theme-color-rgb), 0.4);
+        }
         .orbitron { font-family: 'Orbitron', sans-serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         
@@ -69,9 +73,9 @@
     
     <!-- Login Overlay -->
     <div id="login-overlay" class="fixed inset-0 flex items-center justify-center z-50">
-        <div id="login-bg" class="absolute inset-0 bg-black opacity-90 transition-opacity"></div>
-        <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 border-cyan-400 relative z-10 theme-border">
-            <h1 id="login-title" class="orbitron text-3xl font-bold theme-text mb-2 text-center tracking-tighter">系统身份验证</h1>
+        <div id="login-bg" class="absolute inset-0 bg-black opacity-80 transition-opacity"></div>
+        <div class="glass p-10 rounded-2xl w-full max-w-md border-t-4 theme-border relative z-10">
+            <h1 id="login-title" class="orbitron text-3xl font-bold site-title-themed mb-2 text-center tracking-tighter">系统身份验证</h1>
             <p class="text-gray-500 text-[10px] orbitron mb-8 text-center tracking-[0.2em]">正在访问控制台入口</p>
             <input type="text" id="username-input" placeholder="管理账号" class="input-dark orbitron text-center mb-4">
             <input type="password" id="password-input" placeholder="访问校验码" class="input-dark orbitron text-center mb-6">
@@ -84,7 +88,7 @@
     <div id="admin-content" class="hidden container mx-auto max-w-6xl px-4 py-12">
         <header class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/5 pb-8">
             <div>
-                <h1 class="orbitron text-4xl font-bold tracking-tighter text-white mb-1 uppercase">十夜导航<span class="theme-text">.管理后台</span></h1>
+                <h1 class="orbitron text-4xl font-bold tracking-tighter site-title-themed mb-1 uppercase">十夜导航.管理后台</h1>
                 <p class="text-[10px] text-gray-500 orbitron tracking-[0.4em] uppercase">控制与数据管理子系统 v1.2</p>
             </div>
             <div class="flex items-center space-x-6 mt-6 md:mt-0">
@@ -125,14 +129,14 @@
                                 <span>背景遮罩透明度</span>
                                 <span id="opacity-value" class="theme-text">0.4</span>
                             </label>
-                            <input type="range" id="bg-opacity-input" min="0" max="1" step="0.05" value="0.4" oninput="document.getElementById('opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                            <input type="range" id="bg-opacity-input" min="0" max="1" step="0.05" oninput="document.getElementById('opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer" style="accent-color: var(--theme-color)">
                         </div>
                         <div>
                             <label class="block text-[10px] text-gray-500 mb-2 flex justify-between orbitron uppercase tracking-widest">
                                 <span>卡片磨砂透明度</span>
-                                <span id="card-opacity-value" class="theme-text">0.8</span>
+                                <span id="card-opacity-value" class="theme-text">0.6</span>
                             </label>
-                            <input type="range" id="card-opacity-input" min="0" max="1" step="0.05" value="0.8" oninput="document.getElementById('card-opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                            <input type="range" id="card-opacity-input" min="0" max="1" step="0.05" oninput="document.getElementById('card-opacity-value').innerText = this.value" class="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer" style="accent-color: var(--theme-color)">
                         </div>
                         <div class="pt-4 border-t border-white/5 space-y-4">
                             <h3 class="text-[9px] orbitron text-gray-500 tracking-widest uppercase">账户凭据管理</h3>
@@ -150,13 +154,13 @@
                 </div>
 
                 <div class="glass p-8 rounded-2xl">
-                    <h2 class="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-6 flex items-center">
-                        <span class="w-2 h-2 bg-cyan-400 mr-3"></span>
+                    <h2 class="text-[11px] font-bold uppercase tracking-[0.3em] theme-text mb-6 flex items-center">
+                        <span class="w-2 h-2 theme-bg mr-3"></span>
                         新建部署分类
                     </h2>
                     <label class="block text-[10px] text-gray-500 mb-2 orbitron uppercase tracking-widest">分类识别名</label>
                     <input type="text" id="cat-name-input" placeholder="例如：常用工具" class="input-dark text-xs mb-4 uppercase">
-                    <button onclick="addCategory()" class="w-full bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/5 py-3 rounded text-[11px] orbitron tracking-widest transition">生成分类</button>
+                    <button onclick="addCategory()" class="w-full bg-white/5 border border-white/10 hover:theme-border/50 hover:bg-white/5 py-3 rounded text-[11px] orbitron tracking-widest transition">生成分类</button>
                 </div>
             </div>
 
@@ -172,7 +176,7 @@
 
     <!-- Link Modal -->
     <div id="link-modal" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-40 p-4 backdrop-blur-sm">
-        <div class="glass p-10 rounded-2xl w-full max-w-xl border-l-4 border-cyan-400">
+        <div class="glass p-10 rounded-2xl w-full max-w-xl border-l-4 theme-border">
             <h2 id="modal-title" class="orbitron text-2xl font-bold text-white mb-2 uppercase tracking-tighter">单元数据编辑器</h2>
             <p class="text-[10px] text-gray-500 orbitron mb-8 tracking-[0.3em]">正在修改云端数据单元</p>
             
@@ -190,7 +194,7 @@
                 <div>
                     <label class="block text-[10px] text-gray-500 mb-1 orbitron tracking-widest flex justify-between">
                         <span>图标资源</span>
-                        <span class="text-[8px] text-cyan-400/50">留空则自动抓取图标</span>
+                        <span class="text-[8px] theme-text/50">留空则自动抓取图标</span>
                     </label>
                     <input type="text" id="link-icon" class="input-dark mono text-xs">
                 </div>
@@ -244,10 +248,10 @@
 
                 if (config.backgroundOpacity !== undefined) {
                     document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
-                    // Login backdrop follows system background overlay for consistency
+                    // Login backdrop follows system background overlay
                     const loginBg = document.getElementById('login-bg');
                     if (loginBg) {
-                        loginBg.style.opacity = Math.max(0.6, config.backgroundOpacity); 
+                        loginBg.style.opacity = Math.max(0.7, config.backgroundOpacity); 
                     }
                 }
                 if (config.cardOpacity !== undefined && config.cardOpacity !== "") {
@@ -269,8 +273,8 @@
                     document.getElementById('bg-url-input').value = config.backgroundUrl || '';
                     document.getElementById('bg-opacity-input').value = config.backgroundOpacity || '0.4';
                     document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
-                    document.getElementById('card-opacity-input').value = config.cardOpacity || '0.6';
-                    document.getElementById('card-opacity-value').innerText = config.cardOpacity || '0.6';
+                    document.getElementById('card-opacity-input').value = config.cardOpacity;
+                    document.getElementById('card-opacity-value').innerText = config.cardOpacity;
                     document.getElementById('site-name-input').value = config.siteName || '';
                     document.getElementById('admin-user-input').value = config.adminUsername || '';
                     document.getElementById('theme-color-input').value = config.themeColor || '#00f3ff';
