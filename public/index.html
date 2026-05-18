@@ -237,35 +237,37 @@
             document.getElementById('clock-date').innerText = dateStr;
         }
 
+        function applyConfig(config) {
+            if (config.themeColor) {
+                const hex = config.themeColor.replace('#', '');
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                document.documentElement.style.setProperty('--theme-color', config.themeColor);
+                document.documentElement.style.setProperty('--theme-color-rgb', `${r}, ${g}, ${b}`);
+            }
+            
+            if (config.backgroundUrl) {
+                document.getElementById('body-bg').style.backgroundImage = `url('${config.backgroundUrl}')`;
+            }
+            if (config.backgroundOpacity !== undefined) {
+                document.getElementById('bg-overlay').style.opacity = parseFloat(config.backgroundOpacity);
+            }
+            if (config.cardOpacity !== undefined) {
+                document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
+            }
+            if (config.siteName) {
+                document.getElementById('site-title').innerText = config.siteName;
+                document.title = config.siteName + " | 极简赛博导航";
+            }
+        }
+
         async function init() {
             try {
                 // 加载配置
                 const configRes = await fetch('/api/config');
                 const config = await configRes.json();
-                
-                if (config.themeColor) {
-                    document.documentElement.style.setProperty('--theme-color', config.themeColor);
-                    // Convert Hex to RGB
-                    const hex = config.themeColor.replace('#', '');
-                    const r = parseInt(hex.substring(0, 2), 16);
-                    const g = parseInt(hex.substring(2, 4), 16);
-                    const b = parseInt(hex.substring(4, 6), 16);
-                    document.documentElement.style.setProperty('--theme-color-rgb', `${r}, ${g}, ${b}`);
-                }
-                
-                if (config.backgroundUrl) {
-                    document.getElementById('body-bg').style.backgroundImage = `url('${config.backgroundUrl}')`;
-                }
-                if (config.backgroundOpacity !== undefined) {
-                    document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
-                }
-                if (config.cardOpacity !== undefined) {
-                    document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
-                }
-                if (config.siteName) {
-                    document.getElementById('site-title').innerText = config.siteName;
-                    document.title = config.siteName + " | 极简赛博导航";
-                }
+                applyConfig(config);
 
                 // 加载链接
                 const linksRes = await fetch('/api/links');
@@ -277,7 +279,7 @@
                 document.getElementById('loading').innerHTML = `
                     <div class="text-center p-8 glass border-red-500/20">
                         <p class="text-red-400 font-bold mb-2">DATABASE INITIALIZATION ERROR</p>
-                        <p class="text-gray-500 text-xs uppercase tracking-widest">Please check D1 configuration and Wrangler bindings.</p>
+                        <p class="text-gray-500 text-xs uppercase tracking-widest">Please check system configuration and network status.</p>
                     </div>
                 `;
             }

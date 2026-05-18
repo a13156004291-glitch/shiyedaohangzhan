@@ -30,6 +30,9 @@ INSERT OR IGNORE INTO config (key, value) VALUES ('admin_username', 'admin');
 INSERT OR IGNORE INTO config (key, value) VALUES ('admin_password', 'admin123');
 INSERT OR IGNORE INTO config (key, value) VALUES ('site_name', '十夜导航系统');
 INSERT OR IGNORE INTO config (key, value) VALUES ('theme_color', '#00f3ff');
+INSERT OR IGNORE INTO config (key, value) VALUES ('background_url', '');
+INSERT OR IGNORE INTO config (key, value) VALUES ('background_opacity', '0.4');
+INSERT OR IGNORE INTO config (key, value) VALUES ('card_opacity', '0.6');
 
 -- 添加一个默认分类（防止首页空白）
 INSERT OR IGNORE INTO categories (id, name, order_index) VALUES (1, '我的导航', 1);

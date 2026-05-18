@@ -176,14 +176,14 @@
 
     <!-- Link Modal -->
     <div id="link-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-40 p-4 backdrop-blur-md">
-        <div class="glass p-10 rounded-2xl w-full max-w-xl border-l-4 theme-border relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                <i data-lucide="plus-circle" class="w-32 h-32"></i>
+        <div class="glass p-10 rounded-2xl w-full max-w-xl border-t-4 theme-border relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 p-4 opacity-[0.03] pointer-events-none rotate-12">
+                <i data-lucide="layout" class="w-64 h-64"></i>
             </div>
-            <h2 id="modal-title" class="orbitron text-2xl font-bold theme-text mb-2 uppercase tracking-tighter">单元数据编辑器</h2>
-            <p class="text-[10px] text-gray-500 orbitron mb-8 tracking-[0.3em]">正在修改云端数据单元</p>
+            <h2 id="modal-title" class="orbitron text-2xl font-bold theme-text mb-2 uppercase tracking-tighter">DATA UNIT EDITOR</h2>
+            <p class="text-[10px] text-gray-500 orbitron mb-8 tracking-[0.3em]">MODIFIED_CLOUD_STREAM_SEGMENT</p>
             
-            <div class="space-y-5 relative z-10">
+            <div class="space-y-6 relative z-10">
                 <input type="hidden" id="link-id">
                 <input type="hidden" id="link-cat-id">
                 <div>
@@ -230,62 +230,66 @@
             lucide.createIcons();
         });
 
+        // Apply configurations to UI
+        function applyConfig(config) {
+            if (config.themeColor) {
+                const hex = config.themeColor.replace('#', '');
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                document.documentElement.style.setProperty('--theme-color', config.themeColor);
+                document.documentElement.style.setProperty('--theme-color-rgb', `${r}, ${g}, ${b}`);
+            }
+
+            if (config.backgroundUrl) {
+                document.body.style.backgroundImage = `url('${config.backgroundUrl}')`;
+            }
+
+            const bgOp = config.backgroundOpacity !== undefined ? parseFloat(config.backgroundOpacity) : 0.4;
+            document.getElementById('bg-overlay').style.opacity = bgOp;
+            
+            // Login backdrop
+            const loginBg = document.getElementById('login-bg');
+            if (loginBg) loginBg.style.opacity = bgOp;
+
+            const cardOp = config.cardOpacity !== undefined ? parseFloat(config.cardOpacity) : 0.6;
+            document.documentElement.style.setProperty('--glass-opacity', cardOp);
+
+            if (config.siteName) {
+                document.title = config.siteName + " - 管理后台";
+                const loginTitle = document.getElementById('login-title');
+                if (loginTitle) {
+                    loginTitle.innerText = config.siteName;
+                    loginTitle.classList.add('site-title-themed');
+                }
+                const mainTitle = document.querySelector('h1.orbitron.text-4xl');
+                if (mainTitle) {
+                    mainTitle.innerHTML = config.siteName + '.管理后台';
+                    mainTitle.classList.add('site-title-themed');
+                }
+            }
+
+            // Sync form inputs if they exist (logged in)
+            const siteInput = document.getElementById('site-name-input');
+            if (siteInput) {
+                siteInput.value = config.siteName || '';
+                document.getElementById('theme-color-input').value = config.themeColor || '#00f3ff';
+                document.getElementById('theme-color-picker').value = config.themeColor || '#00f3ff';
+                document.getElementById('bg-url-input').value = config.backgroundUrl || '';
+                document.getElementById('bg-opacity-input').value = bgOp;
+                document.getElementById('opacity-value').innerText = bgOp;
+                document.getElementById('card-opacity-input').value = cardOp;
+                document.getElementById('card-opacity-value').innerText = cardOp;
+                document.getElementById('admin-user-input').value = config.adminUsername || '';
+            }
+        }
+
         async function fetchSystemConfig() {
             try {
                 const res = await fetch('/api/config');
                 const config = await res.json();
-                
-                if (config.themeColor) {
-                    document.documentElement.style.setProperty('--theme-color', config.themeColor);
-                    // Convert Hex to RGB
-                    const hex = config.themeColor.replace('#', '');
-                    const r = parseInt(hex.substring(0, 2), 16);
-                    const g = parseInt(hex.substring(2, 4), 16);
-                    const b = parseInt(hex.substring(4, 6), 16);
-                    document.documentElement.style.setProperty('--theme-color-rgb', `${r}, ${g}, ${b}`);
-                }
-
-                if (config.backgroundUrl) {
-                    document.body.style.backgroundImage = `url('${config.backgroundUrl}')`;
-                }
-
-                if (config.backgroundOpacity !== undefined) {
-                    const op = config.backgroundOpacity !== null ? parseFloat(config.backgroundOpacity) : 0.4;
-                    document.getElementById('bg-overlay').style.opacity = op;
-                    // Login backdrop follows system background overlay for consistency
-                    const loginBg = document.getElementById('login-bg');
-                    if (loginBg) {
-                        loginBg.style.opacity = op; 
-                    }
-                }
-                if (config.cardOpacity !== undefined && config.cardOpacity !== null) {
-                    document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
-                }
-
-                if (config.siteName) {
-                    document.title = config.siteName + " - 管理后台";
-                    if (document.getElementById('login-title')) {
-                        document.getElementById('login-title').innerText = config.siteName;
-                        document.getElementById('login-title').classList.add('site-title-themed');
-                    }
-                    const mainTitle = document.querySelector('h1.orbitron.text-4xl');
-                    if (mainTitle) {
-                        mainTitle.innerHTML = config.siteName + '.管理后台';
-                        mainTitle.classList.add('site-title-themed');
-                    }
-                }
-
-                if (document.getElementById('bg-url-input')) {
-                    document.getElementById('bg-url-input').value = config.backgroundUrl || '';
-                    document.getElementById('bg-opacity-input').value = config.backgroundOpacity !== null ? config.backgroundOpacity : '0.4';
-                    document.getElementById('opacity-value').innerText = config.backgroundOpacity !== null ? config.backgroundOpacity : '0.4';
-                    document.getElementById('card-opacity-input').value = config.cardOpacity !== null ? config.cardOpacity : '0.6';
-                    document.getElementById('card-opacity-value').innerText = config.cardOpacity !== null ? config.cardOpacity : '0.6';
-                    document.getElementById('site-name-input').value = config.siteName || '';
-                    document.getElementById('admin-user-input').value = config.adminUsername || '';
-                    document.getElementById('theme-color-input').value = config.themeColor || '#00f3ff';
-                    document.getElementById('theme-color-picker').value = config.themeColor || '#00f3ff';
-                }
+                window.currentConfig = config;
+                applyConfig(config);
             } catch (e) {
                 console.error("Initial config load failed", e);
             }
@@ -471,43 +475,28 @@
         }
 
         async function updateSettings() {
-            const backgroundUrl = document.getElementById('bg-url-input').value;
-            const backgroundOpacity = document.getElementById('bg-opacity-input').value;
-            const cardOpacity = document.getElementById('card-opacity-input').value;
-            const siteName = document.getElementById('site-name-input').value;
-            const themeColor = document.getElementById('theme-color-input').value;
-            const adminUsername = document.getElementById('admin-user-input').value;
-            const adminPassword = document.getElementById('admin-pass-input').value;
+            const config = {
+                backgroundUrl: document.getElementById('bg-url-input').value,
+                backgroundOpacity: document.getElementById('bg-opacity-input').value,
+                cardOpacity: document.getElementById('card-opacity-input').value,
+                siteName: document.getElementById('site-name-input').value,
+                themeColor: document.getElementById('theme-color-input').value,
+                adminUsername: document.getElementById('admin-user-input').value,
+                adminPassword: document.getElementById('admin-pass-input').value,
+                token: currentToken
+            };
 
             const res = await fetch('/api/config', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    backgroundUrl, 
-                    backgroundOpacity, 
-                    cardOpacity,
-                    siteName,
-                    themeColor,
-                    adminUsername,
-                    adminPassword,
-                    token: currentToken 
-                })
+                body: JSON.stringify(config)
             });
+
             if (res.ok) {
-                if (backgroundUrl) document.body.style.backgroundImage = `url('${backgroundUrl}')`;
-                document.getElementById('bg-overlay').style.opacity = backgroundOpacity;
-                document.documentElement.style.setProperty('--glass-opacity', cardOpacity);
-                if (themeColor) {
-                    document.documentElement.style.setProperty('--theme-color', themeColor);
-                    const hex = themeColor.replace('#', '');
-                    const r = parseInt(hex.substring(0, 2), 16);
-                    const g = parseInt(hex.substring(2, 4), 16);
-                    const b = parseInt(hex.substring(4, 6), 16);
-                    document.documentElement.style.setProperty('--theme-color-rgb', `${r}, ${g}, ${b}`);
-                }
+                applyConfig(config);
                 alert("系统配置已更新");
-                if (adminPassword) {
-                    alert("密码已更改，请重新登录");
+                if (config.adminPassword) {
+                    alert("检测到密码更改，请重新登录");
                     logout();
                 }
             }

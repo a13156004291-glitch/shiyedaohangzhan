@@ -1,73 +1,54 @@
 export async function onRequestGet(context) {
     const { env } = context;
-    const backgroundUrl = await env.DB.prepare("SELECT value FROM config WHERE key = 'background_url'").first("value");
-    const backgroundOpacity = await env.DB.prepare("SELECT value FROM config WHERE key = 'background_opacity'").first("value");
-    const cardOpacity = await env.DB.prepare("SELECT value FROM config WHERE key = 'card_opacity'").first("value");
-    const siteName = await env.DB.prepare("SELECT value FROM config WHERE key = 'site_name'").first("value");
-    const adminUsername = await env.DB.prepare("SELECT value FROM config WHERE key = 'admin_username'").first("value");
-    const themeColor = await env.DB.prepare("SELECT value FROM config WHERE key = 'theme_color'").first("value");
+    const items = await env.DB.prepare("SELECT key, value FROM config").all();
+    const config = {};
+    items.results.forEach(row => {
+        config[row.key] = row.value;
+    });
+
+    const response = {
+        backgroundUrl: config.background_url || "",
+        backgroundOpacity: config.background_opacity || "0.4",
+        cardOpacity: config.card_opacity || "0.6",
+        siteName: config.site_name || "十夜导航系统",
+        adminUsername: config.admin_username || "admin",
+        themeColor: config.theme_color || "#00f3ff"
+    };
     
-    return new Response(JSON.stringify({ 
-        backgroundUrl, 
-        backgroundOpacity: backgroundOpacity !== null ? backgroundOpacity : "0.4",
-        cardOpacity: cardOpacity !== null ? cardOpacity : "0.6",
-        siteName: siteName || "十夜导航系统",
-        adminUsername: adminUsername || "admin",
-        themeColor: themeColor || "#00f3ff"
-    }), {
+    return new Response(JSON.stringify(response), {
         headers: { "Content-Type": "application/json" }
     });
 }
 
 export async function onRequestPost(context) {
     const { request, env } = context;
-    const { backgroundUrl, backgroundOpacity, cardOpacity, themeColor, siteName, adminUsername, adminPassword, token } = await request.json();
+    const body = await request.json();
+    const { token } = body;
 
-    // 简单鉴权校验（实际应校验 token）
     if (!token) {
         return new Response("Unauthorized", { status: 401 });
     }
 
-    if (backgroundUrl !== undefined) {
-        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'background_url'")
-            .bind(backgroundUrl)
-            .run();
+    const mapping = {
+        backgroundUrl: 'background_url',
+        backgroundOpacity: 'background_opacity',
+        cardOpacity: 'card_opacity',
+        themeColor: 'theme_color',
+        siteName: 'site_name',
+        adminUsername: 'admin_username',
+        adminPassword: 'admin_password'
+    };
+
+    const statements = [];
+    for (const [apiKey, dbKey] of Object.entries(mapping)) {
+        const val = body[apiKey];
+        if (val !== undefined && (dbKey !== 'admin_username' || val.trim() !== "") && (dbKey !== 'admin_password' || val.trim() !== "")) {
+            statements.push(env.DB.prepare("INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)").bind(dbKey, String(val)));
+        }
     }
 
-    if (backgroundOpacity !== undefined) {
-        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'background_opacity'")
-            .bind(String(backgroundOpacity))
-            .run();
-    }
-
-    if (cardOpacity !== undefined) {
-        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'card_opacity'")
-            .bind(String(cardOpacity))
-            .run();
-    }
-
-    if (siteName !== undefined) {
-        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'site_name'")
-            .bind(siteName)
-            .run();
-    }
-
-    if (themeColor !== undefined) {
-        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'theme_color'")
-            .bind(themeColor)
-            .run();
-    }
-
-    if (adminUsername !== undefined && adminUsername.trim() !== "") {
-        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'admin_username'")
-            .bind(adminUsername)
-            .run();
-    }
-
-    if (adminPassword !== undefined && adminPassword.trim() !== "") {
-        await env.DB.prepare("UPDATE config SET value = ? WHERE key = 'admin_password'")
-            .bind(adminPassword)
-            .run();
+    if (statements.length > 0) {
+        await env.DB.batch(statements);
     }
 
     return new Response(JSON.stringify({ success: true }), {
