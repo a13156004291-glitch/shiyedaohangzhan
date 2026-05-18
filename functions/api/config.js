@@ -9,8 +9,8 @@ export async function onRequestGet(context) {
     
     return new Response(JSON.stringify({ 
         backgroundUrl, 
-        backgroundOpacity: backgroundOpacity || "0.4",
-        cardOpacity: cardOpacity || "0.6",
+        backgroundOpacity: backgroundOpacity !== null ? backgroundOpacity : "0.4",
+        cardOpacity: cardOpacity !== null ? cardOpacity : "0.6",
         siteName: siteName || "十夜导航系统",
         adminUsername: adminUsername || "admin",
         themeColor: themeColor || "#00f3ff"

@@ -247,14 +247,15 @@
                 }
 
                 if (config.backgroundOpacity !== undefined) {
-                    document.getElementById('bg-overlay').style.opacity = config.backgroundOpacity;
-                    // Login backdrop follows system background overlay
+                    const op = config.backgroundOpacity !== null ? parseFloat(config.backgroundOpacity) : 0.4;
+                    document.getElementById('bg-overlay').style.opacity = op;
+                    // Login backdrop follows system background overlay for consistency
                     const loginBg = document.getElementById('login-bg');
                     if (loginBg) {
-                        loginBg.style.opacity = Math.max(0.7, config.backgroundOpacity); 
+                        loginBg.style.opacity = op; 
                     }
                 }
-                if (config.cardOpacity !== undefined && config.cardOpacity !== "") {
+                if (config.cardOpacity !== undefined && config.cardOpacity !== null) {
                     document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
                 }
 
@@ -262,19 +263,21 @@
                     document.title = config.siteName + " - 管理后台";
                     if (document.getElementById('login-title')) {
                         document.getElementById('login-title').innerText = config.siteName;
+                        document.getElementById('login-title').classList.add('site-title-themed');
                     }
                     const mainTitle = document.querySelector('h1.orbitron.text-4xl');
                     if (mainTitle) {
-                        mainTitle.innerHTML = config.siteName + '<span class="theme-text">.管理后台</span>';
+                        mainTitle.innerHTML = config.siteName + '.管理后台';
+                        mainTitle.classList.add('site-title-themed');
                     }
                 }
 
                 if (document.getElementById('bg-url-input')) {
                     document.getElementById('bg-url-input').value = config.backgroundUrl || '';
-                    document.getElementById('bg-opacity-input').value = config.backgroundOpacity || '0.4';
-                    document.getElementById('opacity-value').innerText = config.backgroundOpacity || '0.4';
-                    document.getElementById('card-opacity-input').value = config.cardOpacity;
-                    document.getElementById('card-opacity-value').innerText = config.cardOpacity;
+                    document.getElementById('bg-opacity-input').value = config.backgroundOpacity !== null ? config.backgroundOpacity : '0.4';
+                    document.getElementById('opacity-value').innerText = config.backgroundOpacity !== null ? config.backgroundOpacity : '0.4';
+                    document.getElementById('card-opacity-input').value = config.cardOpacity !== null ? config.cardOpacity : '0.6';
+                    document.getElementById('card-opacity-value').innerText = config.cardOpacity !== null ? config.cardOpacity : '0.6';
                     document.getElementById('site-name-input').value = config.siteName || '';
                     document.getElementById('admin-user-input').value = config.adminUsername || '';
                     document.getElementById('theme-color-input').value = config.themeColor || '#00f3ff';
