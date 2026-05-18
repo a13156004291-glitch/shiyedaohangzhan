@@ -12,6 +12,7 @@
             --theme-color: var(--neon-blue);
             --theme-color-rgb: 0, 243, 255;
             --glass-opacity: 0.6;
+            --bg-opacity: 0.4;
         }
         body { 
             background: #050510; 
@@ -52,7 +53,7 @@
         .btn-neon:hover { box-shadow: 0 0 20px var(--theme-color); transform: scale(1.02); }
         
         .input-dark {
-            background: rgba(0, 0, 0, var(--glass-opacity));
+            background: rgba(0, 0, 0, var(--bg-opacity));
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
             padding: 0.75rem;
@@ -63,7 +64,7 @@
         .input-dark:focus {
             outline: none;
             border-color: var(--theme-color);
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, calc(var(--bg-opacity) + 0.2));
             box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2);
         }
     </style>
@@ -246,6 +247,7 @@
             }
 
             const bgOp = config.backgroundOpacity !== undefined ? parseFloat(config.backgroundOpacity) : 0.4;
+            document.documentElement.style.setProperty('--bg-opacity', bgOp);
             document.getElementById('bg-overlay').style.opacity = bgOp;
             
             // Login backdrop

@@ -15,6 +15,7 @@
             --theme-color: var(--neon-blue);
             --theme-color-rgb: 0, 243, 255;
             --glass-opacity: 0.6;
+            --bg-opacity: 0.4;
             --glass-bg: rgba(10, 10, 20, var(--glass-opacity));
             --glass-border: rgba(255, 255, 255, 0.08);
             --glow: 0 0 10px rgba(var(--theme-color-rgb), 0.5);
@@ -111,7 +112,7 @@
         }
 
         .search-input {
-            background: rgba(0, 0, 0, var(--glass-opacity));
+            background: rgba(0, 0, 0, var(--bg-opacity));
             border: 1px solid rgba(255, 255, 255, 0.05);
             color: white;
             transition: all 0.4s;
@@ -251,7 +252,9 @@
                 document.getElementById('body-bg').style.backgroundImage = `url('${config.backgroundUrl}')`;
             }
             if (config.backgroundOpacity !== undefined) {
-                document.getElementById('bg-overlay').style.opacity = parseFloat(config.backgroundOpacity);
+                const bgOp = parseFloat(config.backgroundOpacity);
+                document.documentElement.style.setProperty('--bg-opacity', bgOp);
+                document.getElementById('bg-overlay').style.opacity = bgOp;
             }
             if (config.cardOpacity !== undefined) {
                 document.documentElement.style.setProperty('--glass-opacity', config.cardOpacity);
